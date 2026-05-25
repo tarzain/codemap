@@ -9,6 +9,7 @@ import type { CodemapData, Branch, World } from '@/lib/types';
 const STATUS_COLOR: Record<string, string> = {
   open: '#3a82c4',
   draft: '#9a8a6a',
+  suggested: '#b088d0',
   merged: '#7aa648',
   stale: '#7d7569',
   protected: '#d4a23a',
@@ -439,7 +440,8 @@ function SearchPanel({
 
   const STATUSES = [
     { key: 'open', label: 'Open PR', color: STATUS_COLOR.open },
-    { key: 'draft', label: 'Draft', color: STATUS_COLOR.draft },
+    { key: 'draft', label: 'Draft PR', color: STATUS_COLOR.draft },
+    { key: 'suggested', label: 'Suggested', color: STATUS_COLOR.suggested },
     { key: 'merged', label: 'Merged', color: STATUS_COLOR.merged },
     { key: 'protected', label: 'Protected', color: STATUS_COLOR.protected },
     { key: 'stale', label: 'Stale', color: STATUS_COLOR.stale },
@@ -457,7 +459,7 @@ function SearchPanel({
   const suggestions = useMemo(() => {
     const arr = [...matchingBranches];
     arr.sort((a, b) => {
-      const order: Record<string, number> = { protected: 0, release: 1, open: 2, draft: 3, merged: 4, stale: 5 };
+      const order: Record<string, number> = { protected: 0, release: 1, open: 2, draft: 3, suggested: 4, merged: 5, stale: 6 };
       const oa = order[a.status] ?? 6;
       const ob = order[b.status] ?? 6;
       if (oa !== ob) return oa - ob;
@@ -825,10 +827,13 @@ function HelpOverlay({
   onClose: () => void;
   onLoadSample: (path: string) => void;
 }) {
-  const samples = [
-    { path: 'samples/acme-codemap.json', name: 'acme/codemap', branches: 47 },
-    { path: 'samples/openvox-database.json', name: 'openvox/database', branches: 20 },
-  ];
+  const [samples, setSamples] = useState<Array<{ path: string; name: string; branches: number }>>([]);
+  useEffect(() => {
+    fetch('/api/samples')
+      .then((r) => r.json())
+      .then(setSamples)
+      .catch(() => {});
+  }, []);
   return (
     <div className="cm-help-overlay" onClick={onClose}>
       <div className="cm-help-card" onClick={(e) => e.stopPropagation()}>
@@ -901,7 +906,7 @@ function HelpOverlay({
             </div>
             <div>
               <div className="cm-help-label">Status</div>
-              <code>protected · release · open · draft · merged · stale</code>
+              <code>protected · release · open · draft · suggested · merged · stale</code>
             </div>
             <div>
               <div className="cm-help-label">CI</div>

@@ -9,7 +9,7 @@
     "core":    { "label": "Core",          "biome": "mountain" },
     "storage": { "label": "Storage",       "biome": "mountain" },
     "query":   { "label": "Query Engine",  "biome": "forest"   },
-    "net":     { "label": "Networking",    "biome": "water"    },
+    "net":     { "label": "Networking",    "biome": "plains"   },
     "client":  { "label": "Clients",       "biome": "plains"   },
     "perf":    { "label": "Performance",   "biome": "volcanic" },
     "docs":    { "label": "Docs",          "biome": "desert"   },

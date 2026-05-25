@@ -33,7 +33,7 @@ export interface Branch {
   icon?: string;
   author?: string;
   commits?: number;
-  status: "open" | "draft" | "merged" | "stale" | "protected" | "release";
+  status: "open" | "draft" | "suggested" | "merged" | "stale" | "protected" | "release";
   ahead?: number;
   behind?: number;
   lastCommit?: string;

@@ -106,7 +106,7 @@ One subsection per branch (or logical group of related branches). For each:
 - Direction — what it's trying to achieve
 - Status — in progress / merged / stale / experimental
 
-Group related branches together: e.g. all `zain/scaling-*` variants under one heading.
+Group related branches together: e.g. all `username/scaling-*` variants under one heading.
 
 #### 6. Refactoring Opportunities
 Specific, actionable extraction targets. Name the current file, the proposed new file/module, and what moves there. Format:
@@ -164,9 +164,9 @@ For each epoch include:
 
 ## Phase 3 — Write the Codemap JSON
 
-Write `<project>-codemap.json` to `~/workspace/codemap/public/samples/` (the Codemap viewer's samples directory) OR to the project root if that path doesn't exist.
+Write `<project>-codemap.json` to the project root as well, as a sibling to the codetree file.
 
-The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes a landmark on a procedurally-generated terrain map. Semantically-related branches cluster in the same region; the biome signals the nature of the work.
+The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes a landmark on a procedurally-generated terrain map. Semantically-related branches should cluster in the same region; the biome signals the nature of the work.
 
 ### Schema
 
@@ -214,10 +214,9 @@ Choose the biome that matches the nature of the work in each region:
 | `plains` | Mainline, stable, merged production code |
 | `forest` | Active feature development, growing systems |
 | `mountain` | Infrastructure, scaling, hard problems |
-| `water` | Streaming, real-time, experimental/fluid work |
 | `swamp` | Legacy, cleanup, technical debt, stale branches |
 | `desert` | Analytics, observability, config, arid utilities |
-| `volcanic` | Hotfixes, urgent patches, production incidents |
+| `volcanic` | Performance-critical, high-urgency active work |
 
 ### Icons
 
@@ -236,7 +235,7 @@ Choose the biome that matches the nature of the work in each region:
 | `ruin` | Legacy branches, frozen code |
 | `ship` | Streaming, real-time, transport layer work |
 | `obelisk` | Design system, tokens, visual identity |
-| `volcano` | Hotfixes, incidents |
+| `volcano` | Performance-critical, high-urgency active work |
 
 ### Statuses
 
@@ -245,7 +244,8 @@ Choose the biome that matches the nature of the work in each region:
 | `protected` | main, staging — cannot be deleted | gold |
 | `release` | release/* branches | purple |
 | `open` | active open PR or in-progress local work | blue |
-| `draft` | draft PR or planned-but-not-started work | tan |
+| `draft` | draft PR (exists in git, not yet ready for review) | tan |
+| `suggested` | codemap-generated — planned/proposed work that doesn't exist yet | light purple |
 | `merged` | merged into main, still listed for history | green |
 | `stale` | not updated in weeks, likely abandoned | grey |
 
@@ -284,8 +284,6 @@ Position is the most important field in the codemap. It encodes **magnitude and 
 
 **Typical layout for a full-stack web app:**
 ```
-                    [0.50, 0.14] milestones (top)
-
   [0.16, 0.18] fuzz        [0.78, 0.18] docs
 
   [0.28, 0.24] auth        [0.70, 0.36] query/features
@@ -295,8 +293,6 @@ Position is the most important field in the codemap. It encodes **magnitude and 
   [0.30, 0.65] onboarding              [0.86, 0.65] networking
 
   [0.10, 0.85] legacy   [0.56, 0.78] perf   [0.74, 0.76] design
-
-                    [0.60, 0.90] hotfixes (bottom)
 ```
 
 **Key constraints:**
@@ -307,29 +303,30 @@ Position is the most important field in the codemap. It encodes **magnitude and 
 
 ### Including repository history as branches
 
-The codemap needs two additional regions derived from the git history:
+Historical branches — milestones, merged feature branches, and hotpatches — are **extinct branches**. They represent real past states of the code, not metadata about main. They should be positioned **topically**, near the cluster of work they relate to, and visually distinguished as ruins.
 
-#### `milestones` region — development epochs
+#### Milestones — development epochs
 Add one branch per epoch. Epochs are natural clusters of thematically related work identified from the commit log. A new contributor should be able to read these 6–10 entries top-to-bottom and understand the full development arc.
 
-- **biome:** `plains` (stable, completed history)
-- **positions:** cluster near top-center of the map, around `[0.45–0.55, 0.10–0.18]` — above main
+- **region:** assign to the region that best matches the epoch's primary topic (e.g. an auth epoch goes in the auth region)
+- **positions:** place near the topically relevant cluster, slightly closer to main than active branches in that cluster (they've already been merged — less divergent)
 - **status:** `merged` for all
+- **icon:** use the icon that matches the type of work (e.g. `house` for features, `pickaxe` for refactoring, `fort` for infra)
 - **name:** `milestone/<N>-<slug>` e.g. `milestone/1-foundation`, `milestone/6-waitroom-launch`
-- **icon:** use `castle`→`fortress`→`tower`→`keep`→`fort`→`house`→`hut` in sequence (oldest=grandest)
 - **commits:** total commit count for that epoch
 - **behind:** how many commits behind HEAD the epoch's last commit is
 - **lastCommit:** the ISO date of the epoch's last commit (`"2026-04-09"`)
 - **message:** one sentence: "Epoch N — [theme]: [key things shipped]"
+- If an epoch spans multiple topics, assign it to the dominant one. If it's truly cross-cutting (e.g. "initial project setup"), place it near main.
 
-#### `hotpatches` region — direct-to-main commits
+#### Hotpatches — direct-to-main commits
 Add one branch per notable cluster of direct-to-main commits (bypassed branch/PR workflow). These are important for new contributors to know: they show what the team considers urgent enough to skip review.
 
-- **biome:** `volcanic`
-- **positions:** cluster near bottom of the map, around `[0.55–0.65, 0.85–0.92]` — below main
+- **region:** assign to the region the hotpatch affected (e.g. a payments hotfix goes in the payments region)
+- **positions:** place near the topically relevant cluster, close to main (hotpatches are small divergences by nature)
 - **status:** `merged` for all
+- **icon:** use the icon that matches the type of work (e.g. `volcano` for emergencies, `pickaxe` for fixes)
 - **name:** `hotpatch/<slug>` e.g. `hotpatch/admission-cap-crisis`, `hotpatch/gemini-migration`
-- **icon:** `volcano` for emergencies, `rock` for solo additions
 - **message:** describe what was changed and why it bypassed review (capacity emergency, breaking API change, solo addition, etc.)
 
 How to identify direct-to-main commits from the log:
@@ -337,13 +334,16 @@ How to identify direct-to-main commits from the log:
 - Subject lines like "Hotfix:", "Raise X cap", "Fix X format", "Update X" without a corresponding PR merge above them
 - Run `git log --no-merges --format="%h %ad %s" --date=short` and look for same-day clusters
 
+#### Visual treatment of merged branches
+All branches with `status: "merged"` are rendered as ruins by the renderer — the terrain tiles around them are desaturated with a gray wash, making them visually distinct from active landmasses at any zoom level. No special icon or data-level treatment is needed beyond setting `status: "merged"`. Use the icon that semantically describes the type of work.
+
 ### Including planned work as branches
 
 The codemap is not just a git branch viewer — it is a map of the entire work landscape, including work that hasn't started yet.
 
 For every refactoring opportunity, deletion candidate, and expected feature from the codetree, add a corresponding entry in the codemap with:
 - A descriptive `name` that follows existing naming conventions (e.g. `refactor/split-lib`, `feat/graph-view`, `cleanup/legacy-keys`)
-- `status: "draft"`
+- `status: "suggested"`
 - `commits: 0`, `ahead: 0`, `behind: 0`
 - `author: "—"`, `lastCommit: "—"`
 - `ci: "skipped"`
@@ -382,8 +382,9 @@ Before finishing, verify:
 - [ ] Clusters of related branches are within ~0.05 of each other
 - [ ] Unrelated clusters are at least ~0.15 apart (creates water between them)
 - [ ] No two branches at the exact same position (min ~0.02 apart)
-- [ ] `milestones` region present with one entry per epoch, positioned top-center area
-- [ ] `hotpatches` region present with entries for notable direct-to-main commit clusters, positioned bottom area
+- [ ] Milestones present (one per epoch), positioned near their topically relevant cluster, closer to main than active branches
+- [ ] Hotpatches present for notable direct-to-main commit clusters, positioned near the topic they affected
+- [ ] All merged/historical branches use `status: "merged"` (renderer handles visual treatment)
 - [ ] All merged branch `lastCommit` values are real ISO dates or accurate relative strings — not estimates
 - [ ] All merged branch `behind` values are non-zero (they're behind HEAD by definition)
 - [ ] `head` matches the actual current branch from `git branch`

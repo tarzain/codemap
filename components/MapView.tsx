@@ -6,6 +6,7 @@ import {
   hexCenter,
   worldPixelSize,
   renderWorldTerrain,
+  applyMergedOverlay,
   drawBranchMarker,
   drawHexRing,
 } from '@/lib/renderer';
@@ -17,7 +18,8 @@ const { HEX_H } = HEX;
 const STATUS_DOT: Record<string, string> = {
   open: '#3a82c4',
   draft: '#9a8a6a',
-  merged: '#7aa648',
+  suggested: '#b088d0',
+  merged: '#8a8078',
   stale: '#7d7569',
   protected: '#d4a23a',
   release: '#9a5ac4',
@@ -117,6 +119,7 @@ export default function MapView({
     if (!world) return;
     const t0 = performance.now();
     const c = renderWorldTerrain(world);
+    applyMergedOverlay(c, world);
     setTerrainCanvas(c);
     console.log('terrain rendered in', (performance.now() - t0).toFixed(0), 'ms');
   }, [world]);

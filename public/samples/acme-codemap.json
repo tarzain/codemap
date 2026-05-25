@@ -15,7 +15,6 @@
     "infra":     { "label": "Infra & Platform", "biome": "mountain" },
     "exp":       { "label": "Experimental",     "biome": "swamp"    },
     "legacy":    { "label": "Legacy",           "biome": "swamp"    },
-    "hot":       { "label": "Hotfixes",         "biome": "volcanic" },
     "docs":      { "label": "Docs",             "biome": "forest"   },
     "design":    { "label": "Design",           "biome": "desert"   }
   },
@@ -69,8 +68,8 @@
     { "name": "legacy/v2-api",                 "region": "legacy",    "position": [0.12, 0.83], "icon": "ruin",     "author": "\u2014", "commits": 0,    "status": "stale",     "ahead": 0,   "behind": 891,  "lastCommit": "14mo ago", "message": "frozen: pending sunset 2026",                         "pr": null,    "ci": "skipped", "reviewers": [] },
     { "name": "legacy/jquery-dashboard",       "region": "legacy",    "position": [0.08, 0.89], "icon": "ruin",     "author": "\u2014", "commits": 0,    "status": "stale",     "ahead": 0,   "behind": 1102, "lastCommit": "18mo ago", "message": "frozen: do not touch",                                "pr": null,    "ci": "skipped", "reviewers": [] },
 
-    { "name": "hotfix/billing-double-charge",  "region": "hot",       "position": [0.58, 0.76], "icon": "volcano",  "author": "tom.w",  "commits": 1,    "status": "open",      "ahead": 1,   "behind": 0,    "lastCommit": "18m ago",  "message": "HOTFIX: idempotency key on retry",                    "pr": "#2854", "ci": "passing", "reviewers": ["ana.r", "kai.m"] },
-    { "name": "hotfix/outage-2026-05-21",      "region": "hot",       "position": [0.60, 0.78], "icon": "volcano",  "author": "ana.r",  "commits": 4,    "status": "merged",    "ahead": 0,   "behind": 3,    "lastCommit": "2d ago",   "message": "HOTFIX: rate-limit cascade",                          "pr": "#2833", "ci": "passing", "reviewers": ["jun.p"] },
+    { "name": "hotfix/billing-double-charge",  "region": "feat-pay",  "position": [0.75, 0.30], "icon": "volcano",  "author": "tom.w",  "commits": 1,    "status": "open",      "ahead": 1,   "behind": 0,    "lastCommit": "18m ago",  "message": "HOTFIX: idempotency key on retry",                    "pr": "#2854", "ci": "passing", "reviewers": ["ana.r", "kai.m"] },
+    { "name": "hotfix/outage-2026-05-21",      "region": "infra",     "position": [0.84, 0.55], "icon": "volcano",  "author": "ana.r",  "commits": 4,    "status": "merged",    "ahead": 0,   "behind": 3,    "lastCommit": "2d ago",   "message": "HOTFIX: rate-limit cascade",                          "pr": "#2833", "ci": "passing", "reviewers": ["jun.p"] },
 
     { "name": "docs/api-reference-v4",         "region": "docs",      "position": [0.40, 0.50], "icon": "tent",     "author": "sam.l",  "commits": 14,   "status": "open",      "ahead": 14,  "behind": 8,    "lastCommit": "yesterday","message": "docs: regenerate openapi",                            "pr": "#2834", "ci": "passing", "reviewers": [] },
     { "name": "docs/migration-guide-v3-v4",    "region": "docs",      "position": [0.38, 0.52], "icon": "tent",     "author": "noa.b",  "commits": 6,    "status": "open",      "ahead": 6,   "behind": 5,    "lastCommit": "3d ago",   "message": "docs: breaking changes table",                        "pr": "#2830", "ci": "passing", "reviewers": ["sam.l"] },

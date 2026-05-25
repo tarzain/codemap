@@ -128,7 +128,7 @@ export function generateWorld(codemap: CodemapData): World {
 
   // ── 2. Build land from branch positions ──
   // Each branch creates a land blob. Nearby branches merge into landmasses.
-  const LAND_RADIUS = 7;
+  const LAND_RADIUS = 10;
   const landScore = new Float32Array(WORLD_W * WORLD_H);
 
   for (const { hx: bx, hy: by, biome } of branchHex) {
@@ -150,7 +150,7 @@ export function generateWorld(codemap: CodemapData): World {
 
   // ── 3. Threshold with noise for organic coastlines ──
   const isLand = new Uint8Array(WORLD_W * WORLD_H);
-  const THRESHOLD = 0.15;
+  const THRESHOLD = 0.10;
 
   for (let y = 0; y < WORLD_H; y++) {
     for (let x = 0; x < WORLD_W; x++) {

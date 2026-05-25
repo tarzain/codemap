@@ -273,6 +273,72 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
   return canvas;
 }
 
+// Desaturate tiles around merged branches to give them a "ruin" appearance.
+// Draws gray-tinted hexes over the terrain canvas at positions near merged branches.
+export function applyMergedOverlay(
+  canvas: HTMLCanvasElement,
+  world: World,
+): void {
+  const ctx = canvas.getContext("2d")!;
+  const RADIUS = 6; // hex radius around each merged branch to desaturate
+
+  // Collect merged and active branch positions
+  const mergedPositions: Array<{ hx: number; hy: number }> = [];
+  const activePositions: Array<{ hx: number; hy: number }> = [];
+  for (const p of world.placements) {
+    if (p.branch.status === "merged") {
+      mergedPositions.push({ hx: p.hx, hy: p.hy });
+    } else {
+      activePositions.push({ hx: p.hx, hy: p.hy });
+    }
+  }
+  if (mergedPositions.length === 0) return;
+
+  // For each land tile, determine if it's closer to a merged branch than to any active branch.
+  // If so, mark it for desaturation.
+  const marked = new Uint8Array(WORLD_W * WORLD_H);
+  for (const { hx, hy } of mergedPositions) {
+    const x0 = Math.max(0, hx - RADIUS), x1 = Math.min(WORLD_W - 1, hx + RADIUS);
+    const y0 = Math.max(0, hy - RADIUS), y1 = Math.min(WORLD_H - 1, hy + RADIUS);
+    for (let row = y0; row <= y1; row++) {
+      for (let col = x0; col <= x1; col++) {
+        const dx = col - hx, dy = row - hy;
+        const distToMerged = Math.sqrt(dx * dx + dy * dy);
+        if (distToMerged > RADIUS) continue;
+
+        // Only mark if this tile is closer to this merged branch than any active branch
+        let closerToActive = false;
+        for (const a of activePositions) {
+          const adx = col - a.hx, ady = row - a.hy;
+          if (Math.sqrt(adx * adx + ady * ady) < distToMerged) {
+            closerToActive = true;
+            break;
+          }
+        }
+        if (!closerToActive) {
+          marked[row * WORLD_W + col] = 1;
+        }
+      }
+    }
+  }
+
+  // Overlay desaturated hexes
+  for (let row = 0; row < world.h; row++) {
+    for (let col = 0; col < world.w; col++) {
+      if (!marked[row * WORLD_W + col]) continue;
+      const [cx, cy] = hexCenter(col, row);
+      const left = cx - HEX_W / 2;
+      const top = cy - HEX_H / 2;
+      // Semi-transparent gray wash
+      ctx.fillStyle = "rgba(140, 135, 125, 0.5)";
+      for (let y = 0; y < HEX_H; y++) {
+        const [x0, x1] = HEX_MASK[y];
+        ctx.fillRect(left + x0, top + y, x1 - x0 + 1, 1);
+      }
+    }
+  }
+}
+
 function mixHex(a: string, b: string, t: number): string {
   const pa = [parseInt(a.slice(1, 3), 16), parseInt(a.slice(3, 5), 16), parseInt(a.slice(5, 7), 16)];
   const pb = [parseInt(b.slice(1, 3), 16), parseInt(b.slice(3, 5), 16), parseInt(b.slice(5, 7), 16)];
