@@ -22,7 +22,7 @@ const FALLBACK_CODEMAP: CodemapData = {
   seed: 1337,
   head: 'main',
   regions: {
-    capital: { label: 'Mainline', biome: 'plains', center: [0.5, 0.5], spread: 0.06 },
+    capital: { label: 'Mainline', biome: 'plains', center: [0, 0], spread: 0.5 },
   },
   branches: [
     {
@@ -871,8 +871,8 @@ function HelpOverlay({
     "feat-auth": {
       "label": "Auth",
       "biome": "forest",
-      "center": [0.36, 0.22],
-      "spread": 0.08
+      "center": [-2.0, -2.0],
+      "spread": 0.7
     },
     ...
   },
@@ -880,12 +880,13 @@ function HelpOverlay({
     {
       "name": "feature/auth-passkeys",
       "region": "feat-auth",
+      "position": [-2.2, -2.4],
       "icon": "house",
       "author": "mira.k",
       "status": "open",
       "ahead": 31, "behind": 4,
       "lastCommit": "2h ago",
-      "message": "auth: WebAuthn …",
+      "message": "auth: WebAuthn ���",
       "pr": "#2847",
       "ci": "passing",
       "reviewers": ["ana.r"]
@@ -915,8 +916,8 @@ function HelpOverlay({
             <div>
               <div className="cm-help-label">Region center</div>
               <code>
-                [x, y] in [0,1] — branches cluster around this point. Pick coords so
-                semantically-related regions sit near one another.
+                [x, y] origin-centered — main at [0,0]. Branches cluster around this
+                point. Typical range [-5, 5]. Expand outward for new areas.
               </code>
             </div>
           </div>

@@ -4,45 +4,435 @@
   "description": "Sample codemap for an open-source database project — position-based layout.",
   "seed": 4242,
   "head": "wip/lsm-tree-rewrite",
-
   "regions": {
-    "core":    { "label": "Core",          "biome": "mountain" },
-    "storage": { "label": "Storage",       "biome": "mountain" },
-    "query":   { "label": "Query Engine",  "biome": "forest"   },
-    "net":     { "label": "Networking",    "biome": "plains"   },
-    "client":  { "label": "Clients",       "biome": "plains"   },
-    "perf":    { "label": "Performance",   "biome": "volcanic" },
-    "docs":    { "label": "Docs",          "biome": "desert"   },
-    "fuzz":    { "label": "Fuzzing & Test","biome": "swamp"    }
+    "core": {
+      "label": "Core",
+      "biome": "mountain"
+    },
+    "storage": {
+      "label": "Storage",
+      "biome": "mountain"
+    },
+    "query": {
+      "label": "Query Engine",
+      "biome": "forest"
+    },
+    "net": {
+      "label": "Networking",
+      "biome": "plains"
+    },
+    "client": {
+      "label": "Clients",
+      "biome": "plains"
+    },
+    "perf": {
+      "label": "Performance",
+      "biome": "volcanic"
+    },
+    "docs": {
+      "label": "Docs",
+      "biome": "desert"
+    },
+    "fuzz": {
+      "label": "Fuzzing & Test",
+      "biome": "swamp"
+    }
   },
-
   "branches": [
-    { "name": "main",                      "region": "core",    "position": [0.48, 0.46], "icon": "castle",   "author": "@core-team",   "commits": 12483, "status": "protected", "ahead": 0,  "behind": 0,   "lastCommit": "1h ago",   "message": "merge: page cache eviction (#1842)", "pr": null,    "ci": "passing", "reviewers": [] },
-    { "name": "next",                      "region": "core",    "position": [0.51, 0.44], "icon": "fortress", "author": "@core-team",   "commits": 12591, "status": "protected", "ahead": 108,"behind": 0,   "lastCommit": "20m ago",  "message": "ci: green",                          "pr": null,    "ci": "passing", "reviewers": [] },
-    { "name": "release/3.2",               "region": "core",    "position": [0.46, 0.49], "icon": "tower",    "author": "@release-bot", "commits": 12390, "status": "release",   "ahead": 7,  "behind": 95,  "lastCommit": "2d ago",   "message": "release: 3.2.4",                     "pr": "#1850", "ci": "passing", "reviewers": ["@vex.r"] },
-
-    { "name": "wip/lsm-tree-rewrite",      "region": "storage", "position": [0.30, 0.38], "icon": "fort",     "author": "@vex.r",       "commits": 87,    "status": "draft",     "ahead": 87, "behind": 32,  "lastCommit": "3h ago",   "message": "storage: leveled compaction",        "pr": null,    "ci": "failing", "reviewers": [] },
-    { "name": "feat/wal-fsync-batching",   "region": "storage", "position": [0.28, 0.41], "icon": "fort",     "author": "@kara.m",      "commits": 22,    "status": "open",      "ahead": 22, "behind": 14,  "lastCommit": "5h ago",   "message": "wal: batch fsync per epoch",         "pr": "#1845", "ci": "passing", "reviewers": ["@vex.r"] },
-    { "name": "fix/snapshot-leak",         "region": "storage", "position": [0.32, 0.42], "icon": "pickaxe",  "author": "@kara.m",      "commits": 3,     "status": "open",      "ahead": 3,  "behind": 8,   "lastCommit": "yesterday","message": "fix: snapshot refcount leak",        "pr": "#1849", "ci": "passing", "reviewers": [] },
-
-    { "name": "feat/vectorized-execution", "region": "query",   "position": [0.70, 0.36], "icon": "house",    "author": "@silas.t",     "commits": 64,    "status": "open",      "ahead": 64, "behind": 21,  "lastCommit": "2h ago",   "message": "exec: SIMD scan operators",          "pr": "#1844", "ci": "passing", "reviewers": ["@vex.r", "@kara.m"] },
-    { "name": "feat/json-path-pushdown",   "region": "query",   "position": [0.72, 0.39], "icon": "house",    "author": "@silas.t",     "commits": 18,    "status": "draft",     "ahead": 18, "behind": 12,  "lastCommit": "yesterday","message": "planner: push json_path predicates", "pr": null,    "ci": "passing", "reviewers": [] },
-    { "name": "feat/window-functions",     "region": "query",   "position": [0.68, 0.33], "icon": "hut",      "author": "@noor.k",      "commits": 41,    "status": "open",      "ahead": 41, "behind": 19,  "lastCommit": "4h ago",   "message": "planner: LEAD/LAG nulls",            "pr": "#1841", "ci": "passing", "reviewers": ["@silas.t"] },
-
-    { "name": "feat/quic-protocol",        "region": "net",     "position": [0.86, 0.66], "icon": "ship",     "author": "@iris.h",      "commits": 33,    "status": "draft",     "ahead": 33, "behind": 41,  "lastCommit": "2d ago",   "message": "wip: quinn integration",             "pr": null,    "ci": "failing", "reviewers": [] },
-    { "name": "feat/tls-rotation",         "region": "net",     "position": [0.84, 0.63], "icon": "ship",     "author": "@iris.h",      "commits": 9,     "status": "open",      "ahead": 9,  "behind": 6,   "lastCommit": "yesterday","message": "tls: rotate certs without restart",  "pr": "#1843", "ci": "passing", "reviewers": [] },
-
-    { "name": "feat/rust-client-v2",       "region": "client",  "position": [0.22, 0.70], "icon": "house",    "author": "@pim.j",       "commits": 56,    "status": "open",      "ahead": 56, "behind": 22,  "lastCommit": "30m ago",  "message": "client: typed query builder",        "pr": "#1846", "ci": "passing", "reviewers": ["@silas.t"] },
-    { "name": "feat/python-async",         "region": "client",  "position": [0.20, 0.73], "icon": "house",    "author": "@orla.s",      "commits": 24,    "status": "open",      "ahead": 24, "behind": 17,  "lastCommit": "3h ago",   "message": "py: asyncio support",                "pr": "#1840", "ci": "passing", "reviewers": ["@pim.j"] },
-    { "name": "fix/go-driver-panic",       "region": "client",  "position": [0.24, 0.72], "icon": "rock",     "author": "@orla.s",      "commits": 1,     "status": "merged",    "ahead": 0,  "behind": 4,   "lastCommit": "yesterday","message": "fix: panic on nil conn",             "pr": "#1838", "ci": "passing", "reviewers": [] },
-
-    { "name": "perf/parallel-merge",       "region": "perf",    "position": [0.54, 0.78], "icon": "volcano",  "author": "@vex.r",       "commits": 12,    "status": "open",      "ahead": 12, "behind": 18,  "lastCommit": "6h ago",   "message": "perf: parallelize merge phase",      "pr": "#1839", "ci": "passing", "reviewers": ["@kara.m"] },
-    { "name": "perf/page-prefetcher",      "region": "perf",    "position": [0.56, 0.80], "icon": "volcano",  "author": "@kara.m",      "commits": 8,     "status": "draft",     "ahead": 8,  "behind": 11,  "lastCommit": "yesterday","message": "io: adaptive prefetch",              "pr": null,    "ci": "passing", "reviewers": [] },
-
-    { "name": "docs/architecture-2026",    "region": "docs",    "position": [0.78, 0.18], "icon": "obelisk",  "author": "@noor.k",      "commits": 18,    "status": "open",      "ahead": 18, "behind": 9,   "lastCommit": "yesterday","message": "docs: storage internals walkthrough","pr": "#1837", "ci": "passing", "reviewers": [] },
-    { "name": "docs/wire-protocol",        "region": "docs",    "position": [0.80, 0.20], "icon": "obelisk",  "author": "@iris.h",      "commits": 6,     "status": "merged",    "ahead": 0,  "behind": 14,  "lastCommit": "3d ago",   "message": "docs: wire protocol RFC",            "pr": "#1830", "ci": "passing", "reviewers": [] },
-
-    { "name": "fuzz/jepsen-multikey",      "region": "fuzz",    "position": [0.16, 0.18], "icon": "ruin",     "author": "@vex.r",       "commits": 11,    "status": "draft",     "ahead": 11, "behind": 23,  "lastCommit": "1w ago",   "message": "test: multi-key linearizability",    "pr": null,    "ci": "failing", "reviewers": [] },
-    { "name": "fuzz/sqlsmith",             "region": "fuzz",    "position": [0.18, 0.15], "icon": "ruin",     "author": "@silas.t",     "commits": 5,     "status": "draft",     "ahead": 5,  "behind": 31,  "lastCommit": "2w ago",   "message": "test: sqlsmith grammar tweaks",      "pr": null,    "ci": "skipped", "reviewers": [] }
+    {
+      "name": "main",
+      "region": "core",
+      "position": [
+        0,
+        0
+      ],
+      "icon": "castle",
+      "author": "@core-team",
+      "commits": 12483,
+      "status": "protected",
+      "ahead": 0,
+      "behind": 0,
+      "lastCommit": "1h ago",
+      "message": "merge: page cache eviction (#1842)",
+      "pr": null,
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "next",
+      "region": "core",
+      "position": [
+        0.3,
+        -0.2
+      ],
+      "icon": "fortress",
+      "author": "@core-team",
+      "commits": 12591,
+      "status": "protected",
+      "ahead": 108,
+      "behind": 0,
+      "lastCommit": "20m ago",
+      "message": "ci: green",
+      "pr": null,
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "release/3.2",
+      "region": "core",
+      "position": [
+        -0.2,
+        0.3
+      ],
+      "icon": "tower",
+      "author": "@release-bot",
+      "commits": 12390,
+      "status": "release",
+      "ahead": 7,
+      "behind": 95,
+      "lastCommit": "2d ago",
+      "message": "release: 3.2.4",
+      "pr": "#1850",
+      "ci": "passing",
+      "reviewers": [
+        "@vex.r"
+      ]
+    },
+    {
+      "name": "wip/lsm-tree-rewrite",
+      "region": "storage",
+      "position": [
+        -1.8,
+        -0.8
+      ],
+      "icon": "fort",
+      "author": "@vex.r",
+      "commits": 87,
+      "status": "draft",
+      "ahead": 87,
+      "behind": 32,
+      "lastCommit": "3h ago",
+      "message": "storage: leveled compaction",
+      "pr": null,
+      "ci": "failing",
+      "reviewers": []
+    },
+    {
+      "name": "feat/wal-fsync-batching",
+      "region": "storage",
+      "position": [
+        -2,
+        -0.5
+      ],
+      "icon": "fort",
+      "author": "@kara.m",
+      "commits": 22,
+      "status": "open",
+      "ahead": 22,
+      "behind": 14,
+      "lastCommit": "5h ago",
+      "message": "wal: batch fsync per epoch",
+      "pr": "#1845",
+      "ci": "passing",
+      "reviewers": [
+        "@vex.r"
+      ]
+    },
+    {
+      "name": "fix/snapshot-leak",
+      "region": "storage",
+      "position": [
+        -1.6,
+        -0.4
+      ],
+      "icon": "pickaxe",
+      "author": "@kara.m",
+      "commits": 3,
+      "status": "open",
+      "ahead": 3,
+      "behind": 8,
+      "lastCommit": "yesterday",
+      "message": "fix: snapshot refcount leak",
+      "pr": "#1849",
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "feat/vectorized-execution",
+      "region": "query",
+      "position": [
+        2.2,
+        -1
+      ],
+      "icon": "house",
+      "author": "@silas.t",
+      "commits": 64,
+      "status": "open",
+      "ahead": 64,
+      "behind": 21,
+      "lastCommit": "2h ago",
+      "message": "exec: SIMD scan operators",
+      "pr": "#1844",
+      "ci": "passing",
+      "reviewers": [
+        "@vex.r",
+        "@kara.m"
+      ]
+    },
+    {
+      "name": "feat/json-path-pushdown",
+      "region": "query",
+      "position": [
+        2.4,
+        -0.7
+      ],
+      "icon": "house",
+      "author": "@silas.t",
+      "commits": 18,
+      "status": "draft",
+      "ahead": 18,
+      "behind": 12,
+      "lastCommit": "yesterday",
+      "message": "planner: push json_path predicates",
+      "pr": null,
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "feat/window-functions",
+      "region": "query",
+      "position": [
+        2,
+        -1.3
+      ],
+      "icon": "hut",
+      "author": "@noor.k",
+      "commits": 41,
+      "status": "open",
+      "ahead": 41,
+      "behind": 19,
+      "lastCommit": "4h ago",
+      "message": "planner: LEAD/LAG nulls",
+      "pr": "#1841",
+      "ci": "passing",
+      "reviewers": [
+        "@silas.t"
+      ]
+    },
+    {
+      "name": "feat/quic-protocol",
+      "region": "net",
+      "position": [
+        3.8,
+        2
+      ],
+      "icon": "ship",
+      "author": "@iris.h",
+      "commits": 33,
+      "status": "draft",
+      "ahead": 33,
+      "behind": 41,
+      "lastCommit": "2d ago",
+      "message": "wip: quinn integration",
+      "pr": null,
+      "ci": "failing",
+      "reviewers": []
+    },
+    {
+      "name": "feat/tls-rotation",
+      "region": "net",
+      "position": [
+        3.6,
+        1.7
+      ],
+      "icon": "ship",
+      "author": "@iris.h",
+      "commits": 9,
+      "status": "open",
+      "ahead": 9,
+      "behind": 6,
+      "lastCommit": "yesterday",
+      "message": "tls: rotate certs without restart",
+      "pr": "#1843",
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "feat/rust-client-v2",
+      "region": "client",
+      "position": [
+        -2.6,
+        2.4
+      ],
+      "icon": "house",
+      "author": "@pim.j",
+      "commits": 56,
+      "status": "open",
+      "ahead": 56,
+      "behind": 22,
+      "lastCommit": "30m ago",
+      "message": "client: typed query builder",
+      "pr": "#1846",
+      "ci": "passing",
+      "reviewers": [
+        "@silas.t"
+      ]
+    },
+    {
+      "name": "feat/python-async",
+      "region": "client",
+      "position": [
+        -2.8,
+        2.7
+      ],
+      "icon": "house",
+      "author": "@orla.s",
+      "commits": 24,
+      "status": "open",
+      "ahead": 24,
+      "behind": 17,
+      "lastCommit": "3h ago",
+      "message": "py: asyncio support",
+      "pr": "#1840",
+      "ci": "passing",
+      "reviewers": [
+        "@pim.j"
+      ]
+    },
+    {
+      "name": "fix/go-driver-panic",
+      "region": "client",
+      "position": [
+        -2.4,
+        2.6
+      ],
+      "icon": "rock",
+      "author": "@orla.s",
+      "commits": 1,
+      "status": "merged",
+      "ahead": 0,
+      "behind": 4,
+      "lastCommit": "yesterday",
+      "message": "fix: panic on nil conn",
+      "pr": "#1838",
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "perf/parallel-merge",
+      "region": "perf",
+      "position": [
+        0.6,
+        3.2
+      ],
+      "icon": "volcano",
+      "author": "@vex.r",
+      "commits": 12,
+      "status": "open",
+      "ahead": 12,
+      "behind": 18,
+      "lastCommit": "6h ago",
+      "message": "perf: parallelize merge phase",
+      "pr": "#1839",
+      "ci": "passing",
+      "reviewers": [
+        "@kara.m"
+      ]
+    },
+    {
+      "name": "perf/page-prefetcher",
+      "region": "perf",
+      "position": [
+        0.8,
+        3.4
+      ],
+      "icon": "volcano",
+      "author": "@kara.m",
+      "commits": 8,
+      "status": "draft",
+      "ahead": 8,
+      "behind": 11,
+      "lastCommit": "yesterday",
+      "message": "io: adaptive prefetch",
+      "pr": null,
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "docs/architecture-2026",
+      "region": "docs",
+      "position": [
+        3,
+        -2.8
+      ],
+      "icon": "obelisk",
+      "author": "@noor.k",
+      "commits": 18,
+      "status": "open",
+      "ahead": 18,
+      "behind": 9,
+      "lastCommit": "yesterday",
+      "message": "docs: storage internals walkthrough",
+      "pr": "#1837",
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "docs/wire-protocol",
+      "region": "docs",
+      "position": [
+        3.2,
+        -2.6
+      ],
+      "icon": "obelisk",
+      "author": "@iris.h",
+      "commits": 6,
+      "status": "merged",
+      "ahead": 0,
+      "behind": 14,
+      "lastCommit": "3d ago",
+      "message": "docs: wire protocol RFC",
+      "pr": "#1830",
+      "ci": "passing",
+      "reviewers": []
+    },
+    {
+      "name": "fuzz/jepsen-multikey",
+      "region": "fuzz",
+      "position": [
+        -3.2,
+        -2.8
+      ],
+      "icon": "ruin",
+      "author": "@vex.r",
+      "commits": 11,
+      "status": "draft",
+      "ahead": 11,
+      "behind": 23,
+      "lastCommit": "1w ago",
+      "message": "test: multi-key linearizability",
+      "pr": null,
+      "ci": "failing",
+      "reviewers": []
+    },
+    {
+      "name": "fuzz/sqlsmith",
+      "region": "fuzz",
+      "position": [
+        -3,
+        -3.1
+      ],
+      "icon": "ruin",
+      "author": "@silas.t",
+      "commits": 5,
+      "status": "draft",
+      "ahead": 5,
+      "behind": 31,
+      "lastCommit": "2w ago",
+      "message": "test: sqlsmith grammar tweaks",
+      "pr": null,
+      "ci": "skipped",
+      "reviewers": []
+    }
   ]
 }

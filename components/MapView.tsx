@@ -10,6 +10,7 @@ import {
   drawBranchMarker,
   drawHexRing,
 } from '@/lib/renderer';
+import { HEX_DENSITY } from '@/lib/mapgen';
 import type { World, Placement } from '@/lib/types';
 
 const { HEX_H } = HEX;
@@ -79,8 +80,8 @@ export default function MapView({
 
   const clampView = useCallback(
     (v: ViewState): ViewState => {
-      if (!viewportSize) return v;
-      const ws = worldPixelSize();
+      if (!viewportSize || !world) return v;
+      const ws = worldPixelSize(world);
       const sw = ws.w * v.scale;
       const sh = ws.h * v.scale;
       let minX: number, maxX: number, minY: number, maxY: number;
@@ -102,7 +103,7 @@ export default function MapView({
         y: Math.max(minY, Math.min(maxY, v.y)),
       };
     },
-    [viewportSize?.w, viewportSize?.h] // eslint-disable-line react-hooks/exhaustive-deps
+    [viewportSize?.w, viewportSize?.h, world] // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   const setViewClamped = useCallback(
@@ -128,7 +129,7 @@ export default function MapView({
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {
     if (!world || !viewportSize || initialized) return;
-    const ws = worldPixelSize();
+    const ws = worldPixelSize(world);
     const fitScale = Math.min(viewportSize.w / ws.w, viewportSize.h / ws.h) * 0.95;
     const initScale = Math.max(0.5, fitScale);
     const sw = ws.w * initScale;
@@ -215,11 +216,11 @@ export default function MapView({
   };
 
   const scaleBounds = useMemo(() => {
-    if (!viewportSize) return { min: 0.5, max: 8 };
-    const ws = worldPixelSize();
+    if (!viewportSize || !world) return { min: 0.5, max: 8 };
+    const ws = worldPixelSize(world);
     const fit = Math.min(viewportSize.w / ws.w, viewportSize.h / ws.h);
     return { min: Math.max(0.4, fit), max: 8 };
-  }, [viewportSize?.w, viewportSize?.h]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [viewportSize?.w, viewportSize?.h, world]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function zoomAt(mx: number, my: number, delta: number) {
     setViewClamped((v) => {
@@ -251,7 +252,7 @@ export default function MapView({
   useEffect(() => {
     if (!world || !overlayCanvasRef.current || !viewportSize) return;
     const cv = overlayCanvasRef.current;
-    const ws = worldPixelSize();
+    const ws = worldPixelSize(world);
     cv.width = ws.w;
     cv.height = ws.h;
     const ctx = cv.getContext('2d')!;
@@ -337,28 +338,29 @@ export default function MapView({
 
   // High-level region labels — positioned at region center or centroid of placements
   const regionLabels = useMemo(() => {
-    if (!regions || !viewportSize) return [];
-    const ws = worldPixelSize();
+    if (!regions || !viewportSize || !world) return [];
     const out: Array<{ key: string; label: string; x: number; y: number }> = [];
 
     // Compute centroids from placements as fallback for missing centers
     const centroids: Record<string, { sx: number; sy: number; n: number }> = {};
-    if (world) {
-      for (const p of world.placements) {
-        const rk = p.branch.region;
-        if (!centroids[rk]) centroids[rk] = { sx: 0, sy: 0, n: 0 };
-        const c = hexCenter(p.hx, p.hy);
-        centroids[rk].sx += c[0];
-        centroids[rk].sy += c[1];
-        centroids[rk].n++;
-      }
+    for (const p of world.placements) {
+      const rk = p.branch.region;
+      if (!centroids[rk]) centroids[rk] = { sx: 0, sy: 0, n: 0 };
+      const c = hexCenter(p.hx, p.hy);
+      centroids[rk].sx += c[0];
+      centroids[rk].sy += c[1];
+      centroids[rk].n++;
     }
 
     for (const [key, r] of Object.entries(regions)) {
       let wx: number, wy: number;
       if (r.center) {
-        wx = r.center[0] * ws.w;
-        wy = r.center[1] * ws.h;
+        // Convert origin-centered position to hex, then to pixel
+        const chx = world.originHx + r.center[0] * HEX_DENSITY;
+        const chy = world.originHy + r.center[1] * HEX_DENSITY;
+        const [px, py] = hexCenter(Math.round(chx), Math.round(chy));
+        wx = px;
+        wy = py;
       } else if (centroids[key] && centroids[key].n > 0) {
         wx = centroids[key].sx / centroids[key].n;
         wy = centroids[key].sy / centroids[key].n;
@@ -391,7 +393,7 @@ export default function MapView({
     );
   }
 
-  const ws = worldPixelSize();
+  const ws = worldPixelSize(world);
   const cursor = dragRef.current ? 'grabbing' : hoveredBranch ? 'pointer' : 'grab';
 
   return (
@@ -401,7 +403,7 @@ export default function MapView({
         position: 'absolute',
         inset: 0,
         overflow: 'hidden',
-        background: '#1a3a66',
+        background: '#1e2026',
         cursor,
       }}
       onMouseDown={onMouseDown}

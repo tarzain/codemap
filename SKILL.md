@@ -186,7 +186,7 @@ The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes
     {
       "name": "feature/foo",    // branch name (or conceptual name for planned work)
       "region": "<region-id>",  // must match a key in regions — determines biome/terrain
-      "position": [0.35, 0.22], // [x, y] in [0,1] — REQUIRED — where this branch sits on the map
+      "position": [-1.5, -2.6], // [x, y] origin-centered — main at [0,0], unbounded — where this branch sits on the map
       "icon": "<icon-key>",     // see Icons below
       "author": "username",     // git author or "—" for planned
       "commits": 12,            // commit count (0 for planned)
@@ -203,7 +203,7 @@ The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes
 }
 ```
 
-**Important:** The `position` field is the primary layout mechanism. The renderer builds terrain (landmasses, coastlines, water) directly around branch positions. Regions only control biome appearance (what the terrain looks like), not where things go.
+**Important:** The `position` field is the primary layout mechanism. Coordinates are origin-centered: main sits at `[0, 0]` and other branches spread outward with no fixed bounds. The renderer builds terrain (landmasses, coastlines, water) directly around branch positions. The hex grid is sized dynamically from the data. Regions only control biome appearance (what the terrain looks like), not where things go.
 
 ### Biomes
 
@@ -251,55 +251,57 @@ Choose the biome that matches the nature of the work in each region:
 
 ### Designing branch positions
 
-Position is the most important field in the codemap. It encodes **magnitude and direction of change** relative to main and to other branches. The renderer builds terrain around whatever positions you specify — you have full control.
+Position is the most important field in the codemap. It encodes **magnitude and direction of change** relative to main and to other branches. The renderer builds terrain around whatever positions you specify — you have full control. The world grid is sized dynamically from the bounding box of all positions, so there is no hard boundary.
 
 **Core principles:**
 
-1. **Main at center.** Place `main` (or equivalent trunk) near `[0.50, 0.48]`.
+1. **Main at origin.** Place `main` (or equivalent trunk) at `[0, 0]`.
 
-2. **Distance from main = divergence magnitude.** Branches with small changes (1-5 commits, nearly merged) should be close to main. Branches with large divergence (50+ commits ahead, experimental rewrites) should be far away. Use the `ahead` count as a primary signal.
+2. **Distance from main = divergence magnitude.** Branches with small changes (1-5 commits, nearly merged) should be close to [0,0]. Branches with large divergence (50+ commits ahead, experimental rewrites) should be far away. Use the `ahead` count as a primary signal.
 
 3. **Direction from main = area of change.** Branches that modify the same subsystem or files should radiate in the same direction. For example:
-   - Auth/security work → upper-left
-   - Frontend/UI work → north
-   - Backend/infra work → right
-   - Data/storage → lower-right
-   - Docs/config → near center (small changes)
+   - Auth/security work → upper-left (negative x, negative y)
+   - Frontend/UI work → north (negative y)
+   - Backend/infra work → right (positive x)
+   - Data/storage → lower-right (positive x, positive y)
+   - Docs/config → near origin (small changes)
 
 4. **Branches with file overlap cluster together.** If two branches touch the same files, they should be near each other regardless of region. This is more important than region grouping.
 
-5. **Clusters form landmasses.** The renderer builds land under every branch position (radius ~7 hexes). Branches within ~10 hexes of each other merge into a single landmass. Use this to control continent shapes — tight clusters become islands, nearby clusters merge into continents.
+5. **Clusters form landmasses.** The renderer builds land under every branch position (radius ~10 hexes at HEX_DENSITY=10). Branches within ~1.0 unit of each other merge into a single landmass. Use this to control continent shapes — tight clusters become islands, nearby clusters merge into continents.
+
+6. **Expand outward for new areas.** Rather than rearranging existing positions when a codebase grows, expand outward into new territory. The world grid grows dynamically.
 
 **Position assignment process:**
 
 ```
-1. Place main at [0.50, 0.48]
+1. Place main at [0, 0]
 2. For each branch, compute:
    - divergence = ahead / max_ahead_in_repo (normalized 0–1)
    - angle = based on which subsystem/area of code is being changed
-3. Position = main + (divergence * 0.4) in the chosen direction
-4. Adjust to avoid exact overlaps (min ~0.02 apart)
-5. Verify clusters are separated by at least 0.15 from unrelated clusters
+3. Position = divergence * 4.0 in the chosen direction
+4. Adjust to avoid exact overlaps (min ~0.2 apart)
+5. Verify clusters are separated by at least ~1.5 from unrelated clusters
 ```
 
 **Typical layout for a full-stack web app:**
 ```
-  [0.16, 0.18] fuzz        [0.78, 0.18] docs
+  [-3.2, -3.0] fuzz        [3.0, -3.0] docs
 
-  [0.28, 0.24] auth        [0.70, 0.36] query/features
+  [-2.2, -2.4] auth        [2.2, -1.2] query/features
 
-  [0.18, 0.40] bugs    [0.48-0.54, 0.46-0.52] MAIN    [0.84, 0.54] infra
+  [-3.2, -0.8] bugs      [0, 0] MAIN        [3.4, 0.6] infra
 
-  [0.30, 0.65] onboarding              [0.86, 0.65] networking
+  [-2.0, 1.7] onboarding              [3.6, 1.7] networking
 
-  [0.10, 0.85] legacy   [0.56, 0.78] perf   [0.74, 0.76] design
+  [-4.0, 3.8] legacy   [0.6, 3.0] perf   [2.4, 2.8] design
 ```
 
 **Key constraints:**
 - No two branches at the exact same position
-- Branches within the same region should be within ~0.05 of each other
-- Unrelated clusters should be at least ~0.15 apart (creates water between them)
-- Keep all positions within [0.05, 0.95] to avoid edge clipping
+- Branches within the same region should be within ~0.5 units of each other
+- Unrelated clusters should be at least ~1.5 units apart (creates water between them)
+- No hard boundary — positions can extend as needed
 
 ### Including repository history as branches
 
@@ -375,13 +377,13 @@ Before finishing, verify:
 - [ ] §11 history section covers: velocity stats, epoch timeline with state-at-end, direct-to-main table, full PR log
 - [ ] `<project>-codemap.json` written with valid JSON (no trailing commas)
 - [ ] Every branch's `region` value matches a key in `regions`
-- [ ] Every branch has a `position: [x, y]` field with values in [0.05, 0.95]
-- [ ] `main` is positioned near center [0.50, 0.48]
-- [ ] Branch positions reflect divergence: high-ahead branches are farther from main
+- [ ] Every branch has a `position: [x, y]` field (origin-centered, unbounded)
+- [ ] `main` is positioned at [0, 0]
+- [ ] Branch positions reflect divergence: high-ahead branches are farther from origin
 - [ ] Branch positions reflect affinity: branches touching similar files are near each other
-- [ ] Clusters of related branches are within ~0.05 of each other
-- [ ] Unrelated clusters are at least ~0.15 apart (creates water between them)
-- [ ] No two branches at the exact same position (min ~0.02 apart)
+- [ ] Clusters of related branches are within ~0.5 units of each other
+- [ ] Unrelated clusters are at least ~1.5 units apart (creates water between them)
+- [ ] No two branches at the exact same position (min ~0.2 apart)
 - [ ] Milestones present (one per epoch), positioned near their topically relevant cluster, closer to main than active branches
 - [ ] Hotpatches present for notable direct-to-main commit clusters, positioned near the topic they affected
 - [ ] All merged/historical branches use `status: "merged"` (renderer handles visual treatment)

@@ -53,7 +53,10 @@
     {
       "name": "master",
       "region": "trunk",
-      "position": [0.50, 0.48],
+      "position": [
+        0,
+        0
+      ],
       "icon": "castle",
       "author": "Vadim Demedes",
       "commits": 784,
@@ -69,7 +72,10 @@
     {
       "name": "milestone/1-foundation",
       "region": "rendering",
-      "position": [0.42, 0.08],
+      "position": [
+        -0.8,
+        -4
+      ],
       "icon": "castle",
       "author": "Vadim Demedes",
       "commits": 55,
@@ -85,7 +91,10 @@
     {
       "name": "milestone/2-v2-hooks",
       "region": "hooks",
-      "position": [0.46, 0.09],
+      "position": [
+        -0.4,
+        -3.9
+      ],
       "icon": "fortress",
       "author": "Vadim Demedes",
       "commits": 85,
@@ -101,7 +110,10 @@
     {
       "name": "milestone/3-stabilization",
       "region": "hooks",
-      "position": [0.50, 0.10],
+      "position": [
+        0,
+        -3.8
+      ],
       "icon": "tower",
       "author": "Vadim Demedes",
       "commits": 70,
@@ -117,7 +129,10 @@
     {
       "name": "milestone/4-v3-rewrite",
       "region": "rendering",
-      "position": [0.54, 0.09],
+      "position": [
+        0.4,
+        -3.9
+      ],
       "icon": "keep",
       "author": "Vadim Demedes",
       "commits": 90,
@@ -133,7 +148,10 @@
     {
       "name": "milestone/5-esm-v4",
       "region": "infra",
-      "position": [0.58, 0.08],
+      "position": [
+        0.8,
+        -4
+      ],
       "icon": "fort",
       "author": "Vadim Demedes",
       "commits": 120,
@@ -149,7 +167,10 @@
     {
       "name": "milestone/6-react19-v6",
       "region": "rendering",
-      "position": [0.50, 0.14],
+      "position": [
+        0,
+        -3.4
+      ],
       "icon": "house",
       "author": "Vadim Demedes",
       "commits": 75,
@@ -165,7 +186,10 @@
     {
       "name": "milestone/7-v7-concurrent",
       "region": "hooks",
-      "position": [0.46, 0.14],
+      "position": [
+        -0.4,
+        -3.4
+      ],
       "icon": "hut",
       "author": "Vadim Demedes",
       "commits": 198,
@@ -181,7 +205,10 @@
     {
       "name": "declerative-cursor",
       "region": "experimental",
-      "position": [0.22, 0.38],
+      "position": [
+        -2.8,
+        -1
+      ],
       "icon": "tent",
       "author": "Vadim Demedes",
       "commits": 90,
@@ -197,7 +224,10 @@
     {
       "name": "fix-uselayouteffect",
       "region": "rendering",
-      "position": [0.38, 0.34],
+      "position": [
+        -1.2,
+        -1.4
+      ],
       "icon": "hut",
       "author": "Vadim Demedes",
       "commits": 57,
@@ -213,7 +243,10 @@
     {
       "name": "striking-snow-ball",
       "region": "experimental",
-      "position": [0.18, 0.44],
+      "position": [
+        -3.2,
+        -0.4
+      ],
       "icon": "rock",
       "author": "Vadim Demedes",
       "commits": 239,
@@ -229,7 +262,10 @@
     {
       "name": "amazing-lucas-sinclair",
       "region": "cleanup",
-      "position": [0.12, 0.72],
+      "position": [
+        -3.8,
+        2.4
+      ],
       "icon": "rock",
       "author": "—",
       "commits": 237,
@@ -245,7 +281,10 @@
     {
       "name": "bn-l/master",
       "region": "cleanup",
-      "position": [0.14, 0.76],
+      "position": [
+        -3.6,
+        2.8
+      ],
       "icon": "rock",
       "author": "bn-l",
       "commits": 217,
@@ -261,7 +300,10 @@
     {
       "name": "esm",
       "region": "cleanup",
-      "position": [0.10, 0.80],
+      "position": [
+        -4,
+        3.2
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 287,
@@ -277,7 +319,10 @@
     {
       "name": "lovely-will-byers",
       "region": "cleanup",
-      "position": [0.16, 0.80],
+      "position": [
+        -3.4,
+        3.2
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 326,
@@ -293,7 +338,10 @@
     {
       "name": "spectacular-snow-ball",
       "region": "cleanup",
-      "position": [0.12, 0.84],
+      "position": [
+        -3.8,
+        3.6
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 285,
@@ -309,7 +357,10 @@
     {
       "name": "rad-starcourt",
       "region": "cleanup",
-      "position": [0.18, 0.84],
+      "position": [
+        -3.2,
+        3.6
+      ],
       "icon": "rock",
       "author": "Vadim Demedes",
       "commits": 237,
@@ -325,7 +376,10 @@
     {
       "name": "rektdeckard-master",
       "region": "cleanup",
-      "position": [0.08, 0.76],
+      "position": [
+        -4.2,
+        2.8
+      ],
       "icon": "ruin",
       "author": "rektdeckard",
       "commits": 313,
@@ -341,7 +395,10 @@
     {
       "name": "ci-cache",
       "region": "cleanup",
-      "position": [0.08, 0.88],
+      "position": [
+        -4.2,
+        4
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 363,
@@ -357,7 +414,10 @@
     {
       "name": "fix-ci",
       "region": "cleanup",
-      "position": [0.14, 0.88],
+      "position": [
+        -3.6,
+        4
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 295,
@@ -373,7 +433,10 @@
     {
       "name": "fix-flaky-tests",
       "region": "cleanup",
-      "position": [0.20, 0.88],
+      "position": [
+        -3,
+        4
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 363,
@@ -389,7 +452,10 @@
     {
       "name": "update-ci",
       "region": "cleanup",
-      "position": [0.22, 0.84],
+      "position": [
+        -2.8,
+        3.6
+      ],
       "icon": "ruin",
       "author": "Vadim Demedes",
       "commits": 293,
@@ -405,7 +471,10 @@
     {
       "name": "hotpatch/raw-mode-hang",
       "region": "terminal",
-      "position": [0.56, 0.86],
+      "position": [
+        0.6,
+        3.8
+      ],
       "icon": "volcano",
       "author": "Vadim Demedes",
       "commits": 1,
@@ -421,7 +490,10 @@
     {
       "name": "hotpatch/cjk-truncation",
       "region": "rendering",
-      "position": [0.58, 0.88],
+      "position": [
+        0.8,
+        4
+      ],
       "icon": "volcano",
       "author": "Vadim Demedes",
       "commits": 2,
@@ -437,7 +509,10 @@
     {
       "name": "hotpatch/v7-features-sprint",
       "region": "hooks",
-      "position": [0.62, 0.86],
+      "position": [
+        1.2,
+        3.8
+      ],
       "icon": "rock",
       "author": "Vadim Demedes",
       "commits": 12,
@@ -453,7 +528,10 @@
     {
       "name": "hotpatch/node22-breaking",
       "region": "infra",
-      "position": [0.60, 0.90],
+      "position": [
+        1,
+        4.2
+      ],
       "icon": "rock",
       "author": "Vadim Demedes",
       "commits": 1,
@@ -469,7 +547,10 @@
     {
       "name": "hotpatch/fullscreen-flicker",
       "region": "rendering",
-      "position": [0.64, 0.88],
+      "position": [
+        1.4,
+        4
+      ],
       "icon": "volcano",
       "author": "Vadim Demedes",
       "commits": 3,
@@ -485,7 +566,10 @@
     {
       "name": "refactor/split-ink-tsx",
       "region": "rendering",
-      "position": [0.36, 0.38],
+      "position": [
+        -1.4,
+        -1
+      ],
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
@@ -501,7 +585,10 @@
     {
       "name": "refactor/split-styles",
       "region": "layout",
-      "position": [0.72, 0.38],
+      "position": [
+        2.2,
+        -1
+      ],
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
@@ -517,7 +604,10 @@
     {
       "name": "refactor/split-keypress-parser",
       "region": "input",
-      "position": [0.28, 0.54],
+      "position": [
+        -2.2,
+        0.6
+      ],
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
@@ -533,7 +623,10 @@
     {
       "name": "refactor/split-app-component",
       "region": "hooks",
-      "position": [0.36, 0.58],
+      "position": [
+        -1.4,
+        1
+      ],
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
@@ -549,7 +642,10 @@
     {
       "name": "cleanup/stale-branches",
       "region": "cleanup",
-      "position": [0.16, 0.68],
+      "position": [
+        -3.4,
+        2
+      ],
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
@@ -565,7 +661,10 @@
     {
       "name": "feat/scroll-view",
       "region": "features",
-      "position": [0.22, 0.30],
+      "position": [
+        -2.8,
+        -1.8
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -581,7 +680,10 @@
     {
       "name": "feat/mouse-input",
       "region": "input",
-      "position": [0.24, 0.50],
+      "position": [
+        -2.6,
+        0.2
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -597,7 +699,10 @@
     {
       "name": "feat/text-input",
       "region": "hooks",
-      "position": [0.34, 0.62],
+      "position": [
+        -1.6,
+        1.4
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -613,7 +718,10 @@
     {
       "name": "feat/virtual-list",
       "region": "rendering",
-      "position": [0.40, 0.30],
+      "position": [
+        -1,
+        -1.8
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -629,7 +737,10 @@
     {
       "name": "feat/grid-layout",
       "region": "layout",
-      "position": [0.74, 0.42],
+      "position": [
+        2.4,
+        -0.6
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -645,7 +756,10 @@
     {
       "name": "feat/animated-transitions",
       "region": "hooks",
-      "position": [0.38, 0.66],
+      "position": [
+        -1.2,
+        1.8
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -661,7 +775,10 @@
     {
       "name": "feat/snapshot-testing",
       "region": "infra",
-      "position": [0.82, 0.56],
+      "position": [
+        3.2,
+        0.8
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -677,7 +794,10 @@
     {
       "name": "feat/worker-rendering",
       "region": "infra",
-      "position": [0.86, 0.52],
+      "position": [
+        3.6,
+        0.4
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -693,7 +813,10 @@
     {
       "name": "feat/coverage-gate",
       "region": "infra",
-      "position": [0.84, 0.60],
+      "position": [
+        3.4,
+        1.2
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -709,7 +832,10 @@
     {
       "name": "feat/perf-benchmarks-ci",
       "region": "infra",
-      "position": [0.80, 0.64],
+      "position": [
+        3,
+        1.6
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -725,7 +851,10 @@
     {
       "name": "feat/tabs-component",
       "region": "features",
-      "position": [0.26, 0.34],
+      "position": [
+        -2.4,
+        -1.4
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,
@@ -741,7 +870,10 @@
     {
       "name": "feat/hmr",
       "region": "infra",
-      "position": [0.88, 0.48],
+      "position": [
+        3.8,
+        0
+      ],
       "icon": "tent",
       "author": "—",
       "commits": 0,

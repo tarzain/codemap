@@ -61,9 +61,12 @@ export function makeNoise(seed: number): (x: number, y: number, octaves?: number
   };
 }
 
-// World dimensions in hexes
-export const WORLD_W = 96;
-export const WORLD_H = 72;
+// --- World sizing constants ---
+export const HEX_DENSITY = 10; // hexes per position unit
+const MIN_WORLD_W = 60;
+const MIN_WORLD_H = 45;
+const MARGIN = 0.30; // padding fraction on each side of bbox
+const LAND_RADIUS = 10;
 
 // Biome ids
 export const BIOMES = {
@@ -80,9 +83,53 @@ export const BIOMES = {
   PEAK: 10,
   VOLCANIC: 11,
   LAVA: 12,
+  FOG: 13,
 } as const;
 
 export type BiomesType = typeof BIOMES;
+
+function computeWorldDimensions(positions: [number, number][]): { w: number; h: number; originHx: number; originHy: number } {
+  if (positions.length === 0) {
+    return { w: MIN_WORLD_W, h: MIN_WORLD_H, originHx: Math.round(MIN_WORLD_W / 2), originHy: Math.round(MIN_WORLD_H / 2) };
+  }
+
+  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  for (const [px, py] of positions) {
+    if (px < minX) minX = px;
+    if (px > maxX) maxX = px;
+    if (py < minY) minY = py;
+    if (py > maxY) maxY = py;
+  }
+
+  // Use minimum span of 2 if collapsed
+  let spanX = maxX - minX;
+  let spanY = maxY - minY;
+  if (spanX < 2) { const mid = (minX + maxX) / 2; minX = mid - 1; maxX = mid + 1; spanX = 2; }
+  if (spanY < 2) { const mid = (minY + maxY) / 2; minY = mid - 1; maxY = mid + 1; spanY = 2; }
+
+  // Add margin on each side
+  const padX = spanX * MARGIN;
+  const padY = spanY * MARGIN;
+  const paddedMinX = minX - padX;
+  const paddedMinY = minY - padY;
+  const paddedSpanX = spanX + padX * 2;
+  const paddedSpanY = spanY + padY * 2;
+
+  const w = Math.max(MIN_WORLD_W, Math.round(paddedSpanX * HEX_DENSITY));
+  const h = Math.max(MIN_WORLD_H, Math.round(paddedSpanY * HEX_DENSITY));
+
+  // Origin: where position [0,0] maps in hex coords
+  const originHx = Math.round((0 - paddedMinX) / paddedSpanX * w);
+  const originHy = Math.round((0 - paddedMinY) / paddedSpanY * h);
+
+  return { w, h, originHx, originHy };
+}
+
+function positionToHex(pos: [number, number], originHx: number, originHy: number, w: number, h: number): [number, number] {
+  const hx = Math.max(1, Math.min(w - 2, Math.round(originHx + pos[0] * HEX_DENSITY)));
+  const hy = Math.max(1, Math.min(h - 2, Math.round(originHy + pos[1] * HEX_DENSITY)));
+  return [hx, hy];
+}
 
 export function generateWorld(codemap: CodemapData): World {
   const seed = ((codemap.seed ?? 0) | 0) || 1337;
@@ -90,93 +137,132 @@ export function generateWorld(codemap: CodemapData): World {
   const regions = codemap.regions || {};
   const noise = makeNoise(seed);
   const noise2 = makeNoise(seed + 7);
-  const tiles = new Uint8Array(WORLD_W * WORLD_H);
 
-  // ── 1. Resolve branch hex positions ──
-  // Branches with explicit positions use them directly.
-  // Branches without positions fall back to region center + seeded jitter.
+  // ── 1. Collect all positions to determine world size ──
+  const allPositions: [number, number][] = [];
+  for (const branch of branches) {
+    if (branch.position) {
+      allPositions.push(branch.position);
+    } else {
+      const region = regions[branch.region];
+      if (region?.center) allPositions.push(region.center);
+    }
+  }
+
+  const { w, h, originHx, originHy } = computeWorldDimensions(allPositions);
+  const tiles = new Uint8Array(w * h);
+
+  // ── 2. Resolve branch hex positions ──
   const branchHex: Array<{ branch: typeof branches[0]; hx: number; hy: number; biome: string }> = [];
 
   const regionRngs: Record<string, () => number> = {};
-  const regionCounters: Record<string, number> = {};
 
   for (const branch of branches) {
     const region = regions[branch.region];
     const biome = region?.biome ?? "plains";
 
     if (branch.position) {
-      const hx = Math.round(branch.position[0] * (WORLD_W - 2)) + 1;
-      const hy = Math.round(branch.position[1] * (WORLD_H - 2)) + 1;
+      const [hx, hy] = positionToHex(branch.position, originHx, originHy, w, h);
       branchHex.push({ branch, hx, hy, biome });
     } else if (region?.center) {
       // Fallback: jitter around region center
       if (!regionRngs[branch.region]) {
         regionRngs[branch.region] = makeRng(seed + hashStr(branch.region));
-        regionCounters[branch.region] = 0;
       }
       const rng = regionRngs[branch.region];
-      const spread = (region.spread ?? 0.07) * Math.max(WORLD_W, WORLD_H) * 0.5;
-      const cx = region.center[0] * WORLD_W;
-      const cy = region.center[1] * WORLD_H;
+      const spread = (region.spread ?? 0.5) * HEX_DENSITY * 0.5;
+      const [cx, cy] = positionToHex(region.center, originHx, originHy, w, h);
       const ang = rng() * Math.PI * 2;
       const rad = Math.sqrt(rng()) * spread;
-      const hx = Math.max(1, Math.min(WORLD_W - 2, Math.round(cx + Math.cos(ang) * rad)));
-      const hy = Math.max(1, Math.min(WORLD_H - 2, Math.round(cy + Math.sin(ang) * rad)));
+      const hx = Math.max(1, Math.min(w - 2, Math.round(cx + Math.cos(ang) * rad)));
+      const hy = Math.max(1, Math.min(h - 2, Math.round(cy + Math.sin(ang) * rad)));
       branchHex.push({ branch, hx, hy, biome });
     }
   }
 
-  // ── 2. Build land from branch positions ──
-  // Each branch creates a land blob. Nearby branches merge into landmasses.
-  const LAND_RADIUS = 10;
-  const landScore = new Float32Array(WORLD_W * WORLD_H);
+  // ── 3. Build land from branch positions ──
+  const landScore = new Float32Array(w * h);
 
   for (const { hx: bx, hy: by, biome } of branchHex) {
     if (biome === "water") continue;
     const r = LAND_RADIUS;
-    const x0 = Math.max(0, bx - r), x1 = Math.min(WORLD_W - 1, bx + r);
-    const y0 = Math.max(0, by - r), y1 = Math.min(WORLD_H - 1, by + r);
+    const x0 = Math.max(0, bx - r), x1 = Math.min(w - 1, bx + r);
+    const y0 = Math.max(0, by - r), y1 = Math.min(h - 1, by + r);
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
         const dx = x - bx, dy = y - by;
         const d = Math.sqrt(dx * dx + dy * dy);
         if (d < r) {
           const t = 1 - d / r;
-          landScore[y * WORLD_W + x] += t * t;
+          landScore[y * w + x] += t * t;
         }
       }
     }
   }
 
-  // ── 3. Threshold with noise for organic coastlines ──
-  const isLand = new Uint8Array(WORLD_W * WORLD_H);
+  // ── 4. Threshold with noise for organic coastlines (no edge falloff) ──
+  const isLand = new Uint8Array(w * h);
   const THRESHOLD = 0.10;
 
-  for (let y = 0; y < WORLD_H; y++) {
-    for (let x = 0; x < WORLD_W; x++) {
-      const idx = y * WORLD_W + x;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = y * w + x;
       let s = landScore[idx];
       s += (noise(x * 0.1, y * 0.1, 3) - 0.5) * 0.2;
-      const nx = x / WORLD_W, ny = y / WORLD_H;
-      const edge = Math.min(Math.min(nx, 1 - nx), Math.min(ny, 1 - ny));
-      s -= Math.max(0, 0.08 - edge) * 3;
       landScore[idx] = s;
       isLand[idx] = s > THRESHOLD ? 1 : 0;
     }
   }
 
-  // ── 4. Assign biome tiles ──
-  for (let y = 0; y < WORLD_H; y++) {
-    for (let x = 0; x < WORLD_W; x++) {
-      const idx = y * WORLD_W + x;
+  // ── 4b. Convert exterior water to land ──
+  // Flood-fill from map edges through water tiles. Exterior water becomes land
+  // so the perimeter is always land→fog, never water→fog.
+  // Only enclosed interior water (lakes between clusters) is preserved.
+  const exterior = new Uint8Array(w * h);
+  const queue: number[] = [];
+  // Seed with all non-land edge tiles
+  for (let x = 0; x < w; x++) {
+    if (!isLand[x]) { exterior[x] = 1; queue.push(x); }
+    const bot = (h - 1) * w + x;
+    if (!isLand[bot]) { exterior[bot] = 1; queue.push(bot); }
+  }
+  for (let y = 1; y < h - 1; y++) {
+    const left = y * w;
+    if (!isLand[left]) { exterior[left] = 1; queue.push(left); }
+    const right = y * w + w - 1;
+    if (!isLand[right]) { exterior[right] = 1; queue.push(right); }
+  }
+  // BFS through water tiles
+  let qi = 0;
+  while (qi < queue.length) {
+    const idx = queue[qi++];
+    const x = idx % w, y = (idx - x) / w;
+    for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) {
+      const nx = x + dx, ny = y + dy;
+      if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+      const ni = ny * w + nx;
+      if (exterior[ni] || isLand[ni]) continue;
+      exterior[ni] = 1;
+      queue.push(ni);
+    }
+  }
+  // Convert exterior water to land
+  for (let i = 0; i < w * h; i++) {
+    if (exterior[i]) isLand[i] = 1;
+  }
+
+  // ── 5. Assign biome tiles ──
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = y * w + x;
 
       if (!isLand[idx]) {
         let closeLand = false, nearLand = false;
         outer: for (let dy = -4; dy <= 4; dy++) {
           for (let dx = -4; dx <= 4; dx++) {
             const nx2 = x + dx, ny2 = y + dy;
-            if (nx2 < 0 || nx2 >= WORLD_W || ny2 < 0 || ny2 >= WORLD_H) continue;
-            if (!isLand[ny2 * WORLD_W + nx2]) continue;
+            if (nx2 < 0 || nx2 >= w || ny2 < 0 || ny2 >= h) continue;
+            if (!isLand[ny2 * w + nx2]) continue;
             const d = Math.sqrt(dx * dx + dy * dy);
             if (d <= 1.5) { closeLand = true; break outer; }
             else if (d <= 3.5) nearLand = true;
@@ -192,8 +278,8 @@ export function generateWorld(codemap: CodemapData): World {
         for (let dx = -1; dx <= 1 && !coastal; dx++) {
           if (dx === 0 && dy === 0) continue;
           const nx2 = x + dx, ny2 = y + dy;
-          if (nx2 < 0 || nx2 >= WORLD_W || ny2 < 0 || ny2 >= WORLD_H) { coastal = true; continue; }
-          if (!isLand[ny2 * WORLD_W + nx2]) coastal = true;
+          if (nx2 < 0 || nx2 >= w || ny2 < 0 || ny2 >= h) { coastal = true; continue; }
+          if (!isLand[ny2 * w + nx2]) coastal = true;
         }
       }
       if (coastal) { tiles[idx] = BIOMES.BEACH; continue; }
@@ -235,7 +321,26 @@ export function generateWorld(codemap: CodemapData): World {
     }
   }
 
-  // ── 5. Placements: branches go at their resolved positions ──
+  // ── 6. Fog pass: any tile far from all branches becomes FOG ──
+  // This creates the "unexplored territory" edge effect: land fades to fog.
+  const FOG_THRESHOLD = LAND_RADIUS * 1.5;
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      const idx = y * w + x;
+      // Check distance to nearest branch
+      let minDist = Infinity;
+      for (const { hx: bx, hy: by } of branchHex) {
+        const dx = x - bx, dy = y - by;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < minDist) minDist = d;
+      }
+      if (minDist > FOG_THRESHOLD) {
+        tiles[idx] = BIOMES.FOG;
+      }
+    }
+  }
+
+  // ── 7. Placements: branches go at their resolved positions ──
   const placements: Placement[] = [];
   const regionFirstSeen = new Set<string>();
 
@@ -245,7 +350,7 @@ export function generateWorld(codemap: CodemapData): World {
     placements.push({ branch, hx, hy, isFirstInRegion });
   }
 
-  return { tiles, w: WORLD_W, h: WORLD_H, placements };
+  return { tiles, w, h, placements, originHx, originHy };
 }
 
 export function biomeMatches(t: number, want: string): boolean {

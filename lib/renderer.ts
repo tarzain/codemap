@@ -3,7 +3,7 @@
 // - Displays via CSS transform (pan + scale) with image-rendering: pixelated.
 // - Branch icons live in a separate sprite atlas and are drawn each frame on an overlay canvas.
 
-import { BIOMES, WORLD_W, WORLD_H } from "./mapgen";
+import { BIOMES } from "./mapgen";
 import type { World } from "./types";
 
 const HEX_SIZE = 14;
@@ -33,6 +33,7 @@ export const PAL: Record<
   [BIOMES.PEAK]:       { fill: "#bfb8ac", shade: "#a39c90", deco: "#dcd6cb", outline: "#807a6e" },
   [BIOMES.VOLCANIC]:   { fill: "#5d4a44", shade: "#473630", deco: "#75605a", outline: "#2e211c" },
   [BIOMES.LAVA]:       { fill: "#e6532a", shade: "#b53d1c", deco: "#f78a4a", outline: "#7a2510" },
+  [BIOMES.FOG]:        { fill: "#7a8090", shade: "#5e6470", deco: "#8e94a0", outline: "#4a5060" },
 };
 
 // --- Hex mask: per-row [xLeft, xRight] for clean pixel-aligned hex shape ---
@@ -55,17 +56,17 @@ export function hexCenter(col: number, row: number): [number, number] {
 }
 
 // Convert pixel (px, py) → (col, row). Approximate, snaps to nearest hex.
-export function pixelToHex(px: number, py: number): [number, number] {
+export function pixelToHex(px: number, py: number, worldW: number, worldH: number): [number, number] {
   let bestCol = 0, bestRow = 0, bestD = Infinity;
   const approxRow = Math.round((py - HEX_H / 2) / HEX_PITCH_Y);
   for (let dr = -1; dr <= 1; dr++) {
     const r = approxRow + dr;
-    if (r < 0 || r >= WORLD_H) continue;
+    if (r < 0 || r >= worldH) continue;
     const offset = r % 2 ? HEX_OFFSET_X : 0;
     const approxCol = Math.round((px - offset - HEX_W / 2) / HEX_PITCH_X);
     for (let dc = -1; dc <= 1; dc++) {
       const c = approxCol + dc;
-      if (c < 0 || c >= WORLD_W) continue;
+      if (c < 0 || c >= worldW) continue;
       const [cx, cy] = hexCenter(c, r);
       const d = (cx - px) ** 2 + (cy - py) ** 2;
       if (d < bestD) { bestD = d; bestCol = c; bestRow = r; }
@@ -74,10 +75,10 @@ export function pixelToHex(px: number, py: number): [number, number] {
   return [bestCol, bestRow];
 }
 
-export function worldPixelSize(): { w: number; h: number } {
+export function worldPixelSize(world: { w: number; h: number }): { w: number; h: number } {
   return {
-    w: WORLD_W * HEX_PITCH_X + HEX_OFFSET_X,
-    h: WORLD_H * HEX_PITCH_Y + HEX_H - HEX_PITCH_Y,
+    w: world.w * HEX_PITCH_X + HEX_OFFSET_X,
+    h: world.h * HEX_PITCH_Y + HEX_H - HEX_PITCH_Y,
   };
 }
 
@@ -238,17 +239,18 @@ function drawDeco(ctx: CanvasRenderingContext2D, left: number, top: number, biom
 
 // Render the entire world to a single canvas (called once on load).
 export function renderWorldTerrain(world: World): HTMLCanvasElement {
-  const sz = worldPixelSize();
+  const sz = worldPixelSize(world);
   const canvas = document.createElement("canvas");
   canvas.width = sz.w;
   canvas.height = sz.h;
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = false;
 
-  // Pass 1: solid biome fills
+  // Pass 1: solid biome fills (skip FOG — rendered as empty void)
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
       const t = world.tiles[row * world.w + col];
+      if (t === BIOMES.FOG) continue;
       const pal = PAL[t];
       const [cx, cy] = hexCenter(col, row);
       const left = cx - HEX_W / 2;
@@ -257,16 +259,49 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
     }
   }
 
-  // Pass 2: hex grid outlines
+  // Pass 2: hex grid outlines (skip FOG)
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
       const t = world.tiles[row * world.w + col];
+      if (t === BIOMES.FOG) continue;
       const pal = PAL[t];
       const [cx, cy] = hexCenter(col, row);
       const left = cx - HEX_W / 2;
       const top = cy - HEX_H / 2;
       const outlineCol = mixHex(pal.fill, "#ffffff", 0.18);
       strokeHexAt(ctx, left, top, outlineCol);
+    }
+  }
+
+  // Pass 3: fog edge fade — darken land tiles adjacent to fog for a soft transition
+  for (let row = 0; row < world.h; row++) {
+    for (let col = 0; col < world.w; col++) {
+      const t = world.tiles[row * world.w + col];
+      if (t === BIOMES.FOG) continue;
+      // Check if any neighbor is fog
+      let fogDist = 3; // how many rings of fade (0 = adjacent to fog)
+      for (let dy = -2; dy <= 2; dy++) {
+        for (let dx = -2; dx <= 2; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          const nx = col + dx, ny = row + dy;
+          if (nx < 0 || nx >= world.w || ny < 0 || ny >= world.h) continue;
+          if (world.tiles[ny * world.w + nx] === BIOMES.FOG) {
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d < fogDist) fogDist = d;
+          }
+        }
+      }
+      if (fogDist < 3) {
+        const alpha = (1 - fogDist / 3) * 0.55;
+        const [cx, cy] = hexCenter(col, row);
+        const left = cx - HEX_W / 2;
+        const top = cy - HEX_H / 2;
+        ctx.fillStyle = `rgba(30, 32, 38, ${alpha})`;
+        for (let y = 0; y < HEX_H; y++) {
+          const [x0, x1] = HEX_MASK[y];
+          ctx.fillRect(left + x0, top + y, x1 - x0 + 1, 1);
+        }
+      }
     }
   }
 
@@ -296,10 +331,10 @@ export function applyMergedOverlay(
 
   // For each land tile, determine if it's closer to a merged branch than to any active branch.
   // If so, mark it for desaturation.
-  const marked = new Uint8Array(WORLD_W * WORLD_H);
+  const marked = new Uint8Array(world.w * world.h);
   for (const { hx, hy } of mergedPositions) {
-    const x0 = Math.max(0, hx - RADIUS), x1 = Math.min(WORLD_W - 1, hx + RADIUS);
-    const y0 = Math.max(0, hy - RADIUS), y1 = Math.min(WORLD_H - 1, hy + RADIUS);
+    const x0 = Math.max(0, hx - RADIUS), x1 = Math.min(world.w - 1, hx + RADIUS);
+    const y0 = Math.max(0, hy - RADIUS), y1 = Math.min(world.h - 1, hy + RADIUS);
     for (let row = y0; row <= y1; row++) {
       for (let col = x0; col <= x1; col++) {
         const dx = col - hx, dy = row - hy;
@@ -316,7 +351,7 @@ export function applyMergedOverlay(
           }
         }
         if (!closerToActive) {
-          marked[row * WORLD_W + col] = 1;
+          marked[row * world.w + col] = 1;
         }
       }
     }
@@ -325,7 +360,7 @@ export function applyMergedOverlay(
   // Overlay desaturated hexes
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
-      if (!marked[row * WORLD_W + col]) continue;
+      if (!marked[row * world.w + col]) continue;
       const [cx, cy] = hexCenter(col, row);
       const left = cx - HEX_W / 2;
       const top = cy - HEX_H / 2;
