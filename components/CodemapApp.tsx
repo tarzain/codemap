@@ -383,8 +383,6 @@ function validateCodemap(json: unknown): { ok: boolean; error?: string } {
     return { ok: false, error: "Missing 'regions' object." };
   for (const [k, r] of Object.entries(j.regions as Record<string, unknown>)) {
     const region = r as Record<string, unknown>;
-    if (!Array.isArray(region.center) || region.center.length !== 2)
-      return { ok: false, error: `Region "${k}" missing center: [x, y]` };
     if (!region.biome) return { ok: false, error: `Region "${k}" missing biome.` };
   }
   for (const b of j.branches as Array<Record<string, unknown>>) {

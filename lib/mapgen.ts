@@ -88,157 +88,161 @@ export function generateWorld(codemap: CodemapData): World {
   const seed = ((codemap.seed ?? 0) | 0) || 1337;
   const branches = codemap.branches || [];
   const regions = codemap.regions || {};
-
   const noise = makeNoise(seed);
   const noise2 = makeNoise(seed + 7);
   const tiles = new Uint8Array(WORLD_W * WORLD_H);
 
-  // Pre-compute "influence" maps for each region so branch clusters
-  // get the right biome around them.
-  const regionInfluence: Array<{
-    key: string;
-    biome: string;
-    cx: number;
-    cy: number;
-    radius: number;
-  }> = [];
+  // ── 1. Resolve branch hex positions ──
+  // Branches with explicit positions use them directly.
+  // Branches without positions fall back to region center + seeded jitter.
+  const branchHex: Array<{ branch: typeof branches[0]; hx: number; hy: number; biome: string }> = [];
 
-  for (const [key, r] of Object.entries(regions)) {
-    regionInfluence.push({
-      key,
-      biome: r.biome,
-      cx: r.center[0] * WORLD_W,
-      cy: r.center[1] * WORLD_H,
-      radius: (r.spread ?? 0.07) * Math.max(WORLD_W, WORLD_H) * 2.2,
-    });
-  }
+  const regionRngs: Record<string, () => number> = {};
+  const regionCounters: Record<string, number> = {};
 
-  function biomeBias(x: number, y: number) {
-    const bias: Record<string, number> = {
-      water: 0,
-      mountain: 0,
-      forest: 0,
-      swamp: 0,
-      desert: 0,
-      volcanic: 0,
-      plains: 0,
-    };
-    for (const r of regionInfluence) {
-      const dx = x - r.cx,
-        dy = y - r.cy;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      const w = Math.max(0, 1 - d / r.radius);
-      if (w <= 0) continue;
-      const s = w * w;
-      if (r.biome in bias) bias[r.biome] += s;
+  for (const branch of branches) {
+    const region = regions[branch.region];
+    const biome = region?.biome ?? "plains";
+
+    if (branch.position) {
+      const hx = Math.round(branch.position[0] * (WORLD_W - 2)) + 1;
+      const hy = Math.round(branch.position[1] * (WORLD_H - 2)) + 1;
+      branchHex.push({ branch, hx, hy, biome });
+    } else if (region?.center) {
+      // Fallback: jitter around region center
+      if (!regionRngs[branch.region]) {
+        regionRngs[branch.region] = makeRng(seed + hashStr(branch.region));
+        regionCounters[branch.region] = 0;
+      }
+      const rng = regionRngs[branch.region];
+      const spread = (region.spread ?? 0.07) * Math.max(WORLD_W, WORLD_H) * 0.5;
+      const cx = region.center[0] * WORLD_W;
+      const cy = region.center[1] * WORLD_H;
+      const ang = rng() * Math.PI * 2;
+      const rad = Math.sqrt(rng()) * spread;
+      const hx = Math.max(1, Math.min(WORLD_W - 2, Math.round(cx + Math.cos(ang) * rad)));
+      const hy = Math.max(1, Math.min(WORLD_H - 2, Math.round(cy + Math.sin(ang) * rad)));
+      branchHex.push({ branch, hx, hy, biome });
     }
-    return bias;
   }
+
+  // ── 2. Build land from branch positions ──
+  // Each branch creates a land blob. Nearby branches merge into landmasses.
+  const LAND_RADIUS = 7;
+  const landScore = new Float32Array(WORLD_W * WORLD_H);
+
+  for (const { hx: bx, hy: by, biome } of branchHex) {
+    if (biome === "water") continue;
+    const r = LAND_RADIUS;
+    const x0 = Math.max(0, bx - r), x1 = Math.min(WORLD_W - 1, bx + r);
+    const y0 = Math.max(0, by - r), y1 = Math.min(WORLD_H - 1, by + r);
+    for (let y = y0; y <= y1; y++) {
+      for (let x = x0; x <= x1; x++) {
+        const dx = x - bx, dy = y - by;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d < r) {
+          const t = 1 - d / r;
+          landScore[y * WORLD_W + x] += t * t;
+        }
+      }
+    }
+  }
+
+  // ── 3. Threshold with noise for organic coastlines ──
+  const isLand = new Uint8Array(WORLD_W * WORLD_H);
+  const THRESHOLD = 0.15;
 
   for (let y = 0; y < WORLD_H; y++) {
     for (let x = 0; x < WORLD_W; x++) {
-      const nx = x / WORLD_W,
-        ny = y / WORLD_H;
-      let h = noise(x * 0.08, y * 0.08, 4);
-      let m = noise2(x * 0.12 + 100, y * 0.12 + 100, 3);
-
-      const bias = biomeBias(x, y);
-
-      h += bias.mountain * 0.55;
-      h += bias.volcanic * 0.5;
-      h -= bias.water * 0.7;
-      h -= bias.swamp * 0.25;
-      h += bias.forest * 0.1;
-      h += bias.plains * 0.08;
-      h -= bias.desert * 0.05;
-      m += bias.forest * 0.45;
-      m += bias.swamp * 0.6;
-      m -= bias.desert * 0.65;
-      m -= bias.volcanic * 0.35;
-
-      const edgeX = Math.min(nx, 1 - nx);
-      const edgeY = Math.min(ny, 1 - ny);
-      const edge = Math.min(edgeX, edgeY);
-      h -= Math.max(0, 0.18 - edge) * 1.6;
-
-      let t: number;
-      if (h < 0.3) t = BIOMES.DEEP_WATER;
-      else if (h < 0.4) t = BIOMES.WATER;
-      else if (h < 0.44) t = BIOMES.SHORE;
-      else if (h < 0.47) t = BIOMES.BEACH;
-      else if (h > 0.78 && bias.volcanic > 0.05) t = BIOMES.LAVA;
-      else if (h > 0.72) t = BIOMES.PEAK;
-      else if (h > 0.62) t = bias.volcanic > 0.05 ? BIOMES.VOLCANIC : BIOMES.MOUNTAIN;
-      else if (m < 0.32 && bias.swamp < 0.1) t = BIOMES.DESERT;
-      else if (m > 0.62 && bias.swamp > 0.15) t = BIOMES.SWAMP;
-      else if (m > 0.62) t = BIOMES.DEEP_FOREST;
-      else if (m > 0.5) t = BIOMES.FOREST;
-      else t = BIOMES.PLAINS;
-
-      tiles[y * WORLD_W + x] = t;
+      const idx = y * WORLD_W + x;
+      let s = landScore[idx];
+      s += (noise(x * 0.1, y * 0.1, 3) - 0.5) * 0.2;
+      const nx = x / WORLD_W, ny = y / WORLD_H;
+      const edge = Math.min(Math.min(nx, 1 - nx), Math.min(ny, 1 - ny));
+      s -= Math.max(0, 0.08 - edge) * 3;
+      landScore[idx] = s;
+      isLand[idx] = s > THRESHOLD ? 1 : 0;
     }
   }
 
-  // Place branches: snap each branch's region center + jitter to nearest valid tile of correct biome
+  // ── 4. Assign biome tiles ──
+  for (let y = 0; y < WORLD_H; y++) {
+    for (let x = 0; x < WORLD_W; x++) {
+      const idx = y * WORLD_W + x;
+
+      if (!isLand[idx]) {
+        let closeLand = false, nearLand = false;
+        outer: for (let dy = -4; dy <= 4; dy++) {
+          for (let dx = -4; dx <= 4; dx++) {
+            const nx2 = x + dx, ny2 = y + dy;
+            if (nx2 < 0 || nx2 >= WORLD_W || ny2 < 0 || ny2 >= WORLD_H) continue;
+            if (!isLand[ny2 * WORLD_W + nx2]) continue;
+            const d = Math.sqrt(dx * dx + dy * dy);
+            if (d <= 1.5) { closeLand = true; break outer; }
+            else if (d <= 3.5) nearLand = true;
+          }
+        }
+        tiles[idx] = closeLand ? BIOMES.SHORE : nearLand ? BIOMES.WATER : BIOMES.DEEP_WATER;
+        continue;
+      }
+
+      // Beach if adjacent to water
+      let coastal = false;
+      for (let dy = -1; dy <= 1 && !coastal; dy++) {
+        for (let dx = -1; dx <= 1 && !coastal; dx++) {
+          if (dx === 0 && dy === 0) continue;
+          const nx2 = x + dx, ny2 = y + dy;
+          if (nx2 < 0 || nx2 >= WORLD_W || ny2 < 0 || ny2 >= WORLD_H) { coastal = true; continue; }
+          if (!isLand[ny2 * WORLD_W + nx2]) coastal = true;
+        }
+      }
+      if (coastal) { tiles[idx] = BIOMES.BEACH; continue; }
+
+      // Inland: find nearest branch, use its biome
+      let bestDist = Infinity, bestBiome = "plains";
+      for (const { hx: bx, hy: by, biome } of branchHex) {
+        const dx = x - bx, dy = y - by;
+        const d = dx * dx + dy * dy;
+        if (d < bestDist) { bestDist = d; bestBiome = biome; }
+      }
+
+      const m = noise2(x * 0.12 + 100, y * 0.12 + 100, 3);
+      const hv = noise(x * 0.06, y * 0.06, 3);
+
+      switch (bestBiome) {
+        case "mountain":
+          tiles[idx] = hv > 0.68 ? BIOMES.PEAK : hv > 0.42 ? BIOMES.MOUNTAIN : BIOMES.PLAINS;
+          break;
+        case "volcanic":
+          tiles[idx] = hv > 0.73 ? BIOMES.LAVA : hv > 0.42 ? BIOMES.VOLCANIC : BIOMES.MOUNTAIN;
+          break;
+        case "forest":
+          tiles[idx] = m > 0.58 ? BIOMES.DEEP_FOREST : m > 0.32 ? BIOMES.FOREST : BIOMES.PLAINS;
+          break;
+        case "swamp":
+          tiles[idx] = m > 0.42 ? BIOMES.SWAMP : BIOMES.PLAINS;
+          break;
+        case "desert":
+          tiles[idx] = m < 0.55 ? BIOMES.DESERT : BIOMES.PLAINS;
+          break;
+        case "water":
+          tiles[idx] = BIOMES.BEACH;
+          break;
+        default:
+          tiles[idx] = m > 0.62 ? BIOMES.FOREST : BIOMES.PLAINS;
+          break;
+      }
+    }
+  }
+
+  // ── 5. Placements: branches go at their resolved positions ──
   const placements: Placement[] = [];
-  const occupied = new Set<string>();
-  const groupedByRegion: Record<string, typeof branches> = {};
-  for (const b of branches) {
-    (groupedByRegion[b.region] ||= []).push(b);
-  }
+  const regionFirstSeen = new Set<string>();
 
-  for (const [regionKey, list] of Object.entries(groupedByRegion)) {
-    const r = regions[regionKey];
-    if (!r) continue;
-    const cx = r.center[0] * WORLD_W;
-    const cy = r.center[1] * WORLD_H;
-    const spreadHex = (r.spread ?? 0.07) * Math.max(WORLD_W, WORLD_H) * 1.6;
-    const rng = makeRng(seed + hashStr(regionKey));
-    let placedCountInRegion = 0;
-    for (const branch of list) {
-      let placed = false;
-      const isFirstInRegion = placedCountInRegion === 0;
-      for (let attempt = 0; attempt < 200 && !placed; attempt++) {
-        const ang = rng() * Math.PI * 2;
-        const rad = Math.sqrt(rng()) * spreadHex;
-        const hx = Math.round(cx + Math.cos(ang) * rad);
-        const hy = Math.round(cy + Math.sin(ang) * rad);
-        if (hx < 1 || hx >= WORLD_W - 1 || hy < 1 || hy >= WORLD_H - 1) continue;
-        const key = hx + "," + hy;
-        if (occupied.has(key)) continue;
-        let tooClose = false;
-        for (const p of placements) {
-          const dx = p.hx - hx,
-            dy = p.hy - hy;
-          if (dx * dx + dy * dy < 5) {
-            tooClose = true;
-            break;
-          }
-        }
-        if (tooClose) continue;
-        const t = tiles[hy * WORLD_W + hx];
-        if (!biomeMatches(t, r.biome)) continue;
-        placements.push({ branch, hx, hy, isFirstInRegion });
-        occupied.add(key);
-        placed = true;
-        placedCountInRegion++;
-      }
-      if (!placed) {
-        for (let dy = -8; dy <= 8 && !placed; dy++) {
-          for (let dx = -8; dx <= 8 && !placed; dx++) {
-            const hx = Math.round(cx) + dx;
-            const hy = Math.round(cy) + dy;
-            if (hx < 1 || hx >= WORLD_W - 1 || hy < 1 || hy >= WORLD_H - 1) continue;
-            const key = hx + "," + hy;
-            if (occupied.has(key)) continue;
-            placements.push({ branch, hx, hy, isFirstInRegion });
-            occupied.add(key);
-            placed = true;
-            placedCountInRegion++;
-          }
-        }
-      }
-    }
+  for (const { branch, hx, hy } of branchHex) {
+    const isFirstInRegion = !regionFirstSeen.has(branch.region);
+    regionFirstSeen.add(branch.region);
+    placements.push({ branch, hx, hy, isFirstInRegion });
   }
 
   return { tiles, w: WORLD_W, h: WORLD_H, placements };
@@ -253,7 +257,7 @@ export function biomeMatches(t: number, want: string): boolean {
     case "mountain":
       return t === BIOMES.MOUNTAIN || t === BIOMES.PEAK;
     case "water":
-      return t === BIOMES.WATER || t === BIOMES.SHORE || t === BIOMES.BEACH;
+      return t === BIOMES.SHORE || t === BIOMES.BEACH;
     case "swamp":
       return t === BIOMES.SWAMP || t === BIOMES.PLAINS;
     case "desert":

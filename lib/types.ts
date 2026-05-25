@@ -22,13 +22,14 @@ export type BiomeKey = "plains" | "forest" | "mountain" | "water" | "swamp" | "d
 export interface Region {
   label?: string;
   biome: BiomeKey;
-  center: [number, number];
+  center?: [number, number];
   spread?: number;
 }
 
 export interface Branch {
   name: string;
   region: string;
+  position?: [number, number];
   icon?: string;
   author?: string;
   commits?: number;

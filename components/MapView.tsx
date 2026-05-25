@@ -36,7 +36,7 @@ interface ViewportSize {
 
 interface RegionData {
   label?: string;
-  center: [number, number];
+  center?: [number, number];
 }
 
 interface MapViewProps {
@@ -332,20 +332,42 @@ export default function MapView({
     return out;
   }, [world, view, hoveredBranch, selectedBranch, showLabels, dimmedBranches, currentCheckout]);
 
-  // High-level region labels
+  // High-level region labels — positioned at region center or centroid of placements
   const regionLabels = useMemo(() => {
     if (!regions || !viewportSize) return [];
     const ws = worldPixelSize();
     const out: Array<{ key: string; label: string; x: number; y: number }> = [];
+
+    // Compute centroids from placements as fallback for missing centers
+    const centroids: Record<string, { sx: number; sy: number; n: number }> = {};
+    if (world) {
+      for (const p of world.placements) {
+        const rk = p.branch.region;
+        if (!centroids[rk]) centroids[rk] = { sx: 0, sy: 0, n: 0 };
+        const c = hexCenter(p.hx, p.hy);
+        centroids[rk].sx += c[0];
+        centroids[rk].sy += c[1];
+        centroids[rk].n++;
+      }
+    }
+
     for (const [key, r] of Object.entries(regions)) {
-      const wx = r.center[0] * ws.w;
-      const wy = r.center[1] * ws.h;
+      let wx: number, wy: number;
+      if (r.center) {
+        wx = r.center[0] * ws.w;
+        wy = r.center[1] * ws.h;
+      } else if (centroids[key] && centroids[key].n > 0) {
+        wx = centroids[key].sx / centroids[key].n;
+        wy = centroids[key].sy / centroids[key].n;
+      } else {
+        continue;
+      }
       const sx = wx * view.scale + view.x;
       const sy = wy * view.scale + view.y;
       out.push({ key, label: r.label || key, x: sx, y: sy });
     }
     return out;
-  }, [regions, view, viewportSize]);
+  }, [regions, world, view, viewportSize]);
 
   if (!world || !terrainCanvas) {
     return (
