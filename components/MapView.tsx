@@ -412,6 +412,7 @@ export default function MapView({
       onMouseLeave={onMouseLeave}
       onWheel={onWheel}
     >
+      {/* Terrain tiles + marker overlay */}
       <div
         style={{
           position: 'absolute',
@@ -421,7 +422,6 @@ export default function MapView({
           height: ws.h,
           transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
           transformOrigin: '0 0',
-          imageRendering: 'pixelated',
           willChange: 'transform',
         }}
       >
@@ -430,7 +430,7 @@ export default function MapView({
           ref={overlayCanvasRef}
           width={ws.w}
           height={ws.h}
-          style={{ position: 'absolute', left: 0, top: 0, imageRendering: 'pixelated' }}
+          style={{ position: 'absolute', left: 0, top: 0 }}
         />
       </div>
 
@@ -521,13 +521,12 @@ function CanvasMirror({ canvas }: { canvas: HTMLCanvasElement }) {
     ref.current.width = canvas.width;
     ref.current.height = canvas.height;
     const ctx = ref.current.getContext('2d')!;
-    ctx.imageSmoothingEnabled = false;
     ctx.drawImage(canvas, 0, 0);
   }, [canvas]);
   return (
     <canvas
       ref={ref}
-      style={{ position: 'absolute', left: 0, top: 0, imageRendering: 'pixelated' }}
+      style={{ position: 'absolute', left: 0, top: 0 }}
     />
   );
 }

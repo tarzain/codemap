@@ -246,16 +246,14 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = false;
 
-  // Pass 1: solid biome fills (skip FOG — rendered as empty void)
+  // Pass 1: solid biome fills (skip FOG)
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
       const t = world.tiles[row * world.w + col];
       if (t === BIOMES.FOG) continue;
       const pal = PAL[t];
       const [cx, cy] = hexCenter(col, row);
-      const left = cx - HEX_W / 2;
-      const top = cy - HEX_H / 2;
-      fillHexAt(ctx, left, top, pal.fill);
+      fillHexAt(ctx, cx - HEX_W / 2, cy - HEX_H / 2, pal.fill);
     }
   }
 
@@ -266,42 +264,9 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
       if (t === BIOMES.FOG) continue;
       const pal = PAL[t];
       const [cx, cy] = hexCenter(col, row);
-      const left = cx - HEX_W / 2;
-      const top = cy - HEX_H / 2;
-      const outlineCol = mixHex(pal.fill, "#ffffff", 0.18);
-      strokeHexAt(ctx, left, top, outlineCol);
+      strokeHexAt(ctx, cx - HEX_W / 2, cy - HEX_H / 2, mixHex(pal.fill, "#ffffff", 0.18));
     }
   }
-
-  // Pass 3: smooth fog fade — blur the terrain's own alpha at fog edges
-  // Build a white mask of terrain tiles, blur it, then use destination-in
-  // to fade the terrain canvas alpha. The dark background shows through.
-  const BLUR_PX = Math.round(Math.max(world.w, world.h) * 1.8);
-
-  const maskCv = document.createElement("canvas");
-  maskCv.width = sz.w;
-  maskCv.height = sz.h;
-  const maskCtx = maskCv.getContext("2d")!;
-  maskCtx.fillStyle = "#fff";
-  for (let row = 0; row < world.h; row++) {
-    for (let col = 0; col < world.w; col++) {
-      if (world.tiles[row * world.w + col] === BIOMES.FOG) continue;
-      const [cx, cy] = hexCenter(col, row);
-      fillHexAt(maskCtx, cx - HEX_W / 2, cy - HEX_H / 2, "#fff");
-    }
-  }
-
-  const blurCv = document.createElement("canvas");
-  blurCv.width = sz.w;
-  blurCv.height = sz.h;
-  const blurCtx = blurCv.getContext("2d")!;
-  blurCtx.filter = `blur(${BLUR_PX}px)`;
-  blurCtx.drawImage(maskCv, 0, 0);
-
-  // Fade terrain alpha using blurred mask
-  ctx.globalCompositeOperation = "destination-in";
-  ctx.drawImage(blurCv, 0, 0);
-  ctx.globalCompositeOperation = "source-over";
 
   return canvas;
 }
