@@ -33,7 +33,6 @@ export const PAL: Record<
   [BIOMES.PEAK]:       { fill: "#bfb8ac", shade: "#a39c90", deco: "#dcd6cb", outline: "#807a6e" },
   [BIOMES.VOLCANIC]:   { fill: "#5d4a44", shade: "#473630", deco: "#75605a", outline: "#2e211c" },
   [BIOMES.LAVA]:       { fill: "#e6532a", shade: "#b53d1c", deco: "#f78a4a", outline: "#7a2510" },
-  [BIOMES.FOG]:        { fill: "#7a8090", shade: "#5e6470", deco: "#8e94a0", outline: "#4a5060" },
 };
 
 // --- Hex mask: per-row [xLeft, xRight] for clean pixel-aligned hex shape ---
@@ -246,22 +245,20 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
   const ctx = canvas.getContext("2d")!;
   ctx.imageSmoothingEnabled = false;
 
-  // Pass 1: solid biome fills (skip FOG)
+  // Pass 1: solid biome fills
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
       const t = world.tiles[row * world.w + col];
-      if (t === BIOMES.FOG) continue;
       const pal = PAL[t];
       const [cx, cy] = hexCenter(col, row);
       fillHexAt(ctx, cx - HEX_W / 2, cy - HEX_H / 2, pal.fill);
     }
   }
 
-  // Pass 2: hex grid outlines (skip FOG)
+  // Pass 2: hex grid outlines
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
       const t = world.tiles[row * world.w + col];
-      if (t === BIOMES.FOG) continue;
       const pal = PAL[t];
       const [cx, cy] = hexCenter(col, row);
       strokeHexAt(ctx, cx - HEX_W / 2, cy - HEX_H / 2, mixHex(pal.fill, "#ffffff", 0.18));

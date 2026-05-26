@@ -67,6 +67,7 @@ const MIN_WORLD_W = 60;
 const MIN_WORLD_H = 45;
 const MARGIN = 0.30; // padding fraction on each side of bbox
 const LAND_RADIUS = 10;
+const MAX_FILLED_FOG_HOLE = 96;
 
 // Biome ids
 export const BIOMES = {
@@ -83,7 +84,6 @@ export const BIOMES = {
   PEAK: 10,
   VOLCANIC: 11,
   LAVA: 12,
-  FOG: 13,
 } as const;
 
 export type BiomesType = typeof BIOMES;
@@ -321,8 +321,10 @@ export function generateWorld(codemap: CodemapData): World {
     }
   }
 
-  // ── 6. Fog pass: any tile far from all branches becomes FOG ──
-  // This creates the "unexplored territory" edge effect: land fades to fog.
+  // ── 6. Visibility pass: any tile far from all branches is covered by fog ──
+  // Fog is rendered as a frontend overlay, so terrain remains terrain-only.
+  const visibility = new Uint8Array(w * h);
+  visibility.fill(1);
   const FOG_THRESHOLD = LAND_RADIUS * 1.5;
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
@@ -335,10 +337,11 @@ export function generateWorld(codemap: CodemapData): World {
         if (d < minDist) minDist = d;
       }
       if (minDist > FOG_THRESHOLD) {
-        tiles[idx] = BIOMES.FOG;
+        visibility[idx] = 0;
       }
     }
   }
+  fillSmallFogHoles(visibility, w, h, MAX_FILLED_FOG_HOLE);
 
   // ── 7. Placements: branches go at their resolved positions ──
   const placements: Placement[] = [];
@@ -350,7 +353,45 @@ export function generateWorld(codemap: CodemapData): World {
     placements.push({ branch, hx, hy, isFirstInRegion });
   }
 
-  return { tiles, w, h, placements, originHx, originHy };
+  return { tiles, visibility, w, h, placements, originHx, originHy };
+}
+
+function fillSmallFogHoles(visibility: Uint8Array, w: number, h: number, maxSize: number): void {
+  const seen = new Uint8Array(w * h);
+  const queue: number[] = [];
+  const component: number[] = [];
+
+  for (let start = 0; start < w * h; start++) {
+    if (seen[start] || visibility[start]) continue;
+
+    queue.length = 0;
+    component.length = 0;
+    queue.push(start);
+    seen[start] = 1;
+    let touchesEdge = false;
+
+    for (let qi = 0; qi < queue.length; qi++) {
+      const idx = queue[qi];
+      component.push(idx);
+      const x = idx % w;
+      const y = (idx - x) / w;
+      if (x === 0 || x === w - 1 || y === 0 || y === h - 1) touchesEdge = true;
+
+      for (const [dx, dy] of [[-1, 0], [1, 0], [0, -1], [0, 1]] as const) {
+        const nx = x + dx;
+        const ny = y + dy;
+        if (nx < 0 || nx >= w || ny < 0 || ny >= h) continue;
+        const ni = ny * w + nx;
+        if (seen[ni] || visibility[ni]) continue;
+        seen[ni] = 1;
+        queue.push(ni);
+      }
+    }
+
+    if (!touchesEdge && component.length <= maxSize) {
+      for (const idx of component) visibility[idx] = 1;
+    }
+  }
 }
 
 export function biomeMatches(t: number, want: string): boolean {

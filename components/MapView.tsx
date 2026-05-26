@@ -14,6 +14,8 @@ import { HEX_DENSITY } from '@/lib/mapgen';
 import type { World, Placement } from '@/lib/types';
 
 const { HEX_H } = HEX;
+const FOG_COLOR = '#141618';
+const FOG_BLUR_PX = 28;
 
 // Status → marker color
 const STATUS_DOT: Record<string, string> = {
@@ -71,6 +73,7 @@ export default function MapView({
 }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
+  const fogCanvasRef = useRef<HTMLCanvasElement>(null);
   const [terrainCanvas, setTerrainCanvas] = useState<HTMLCanvasElement | null>(null);
 
   const [view, setView] = useState<ViewState>({ x: 0, y: 0, scale: 1.0 });
@@ -299,6 +302,65 @@ export default function MapView({
     }
   }, [world, view, hoveredBranch, selectedBranch, showLabels, dimmedBranches, currentCheckout]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Render high-resolution frontend fog over the pixel terrain.
+  useEffect(() => {
+    if (!world || !fogCanvasRef.current || !viewportSize) return;
+
+    const cv = fogCanvasRef.current;
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    const pixelW = Math.max(1, Math.round(viewportSize.w * dpr));
+    const pixelH = Math.max(1, Math.round(viewportSize.h * dpr));
+    if (cv.width !== pixelW) cv.width = pixelW;
+    if (cv.height !== pixelH) cv.height = pixelH;
+    cv.style.width = `${viewportSize.w}px`;
+    cv.style.height = `${viewportSize.h}px`;
+
+    const mask = document.createElement('canvas');
+    mask.width = pixelW;
+    mask.height = pixelH;
+
+    const maskCtx = mask.getContext('2d')!;
+    maskCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    maskCtx.clearRect(0, 0, viewportSize.w, viewportSize.h);
+    maskCtx.fillStyle = '#fff';
+
+    const stampRadius = Math.max(12, HEX_H * view.scale * 0.9);
+    for (let row = 0; row < world.h; row++) {
+      for (let col = 0; col < world.w; col++) {
+        const idx = row * world.w + col;
+        if (!world.visibility[idx]) continue;
+
+        const [cx, cy] = hexCenter(col, row);
+        const sx = cx * view.scale + view.x;
+        const sy = cy * view.scale + view.y;
+        if (
+          sx < -stampRadius ||
+          sx > viewportSize.w + stampRadius ||
+          sy < -stampRadius ||
+          sy > viewportSize.h + stampRadius
+        ) {
+          continue;
+        }
+
+        maskCtx.beginPath();
+        maskCtx.arc(sx, sy, stampRadius, 0, Math.PI * 2);
+        maskCtx.fill();
+      }
+    }
+
+    const ctx = cv.getContext('2d')!;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, viewportSize.w, viewportSize.h);
+    ctx.fillStyle = FOG_COLOR;
+    ctx.fillRect(0, 0, viewportSize.w, viewportSize.h);
+
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.filter = `blur(${FOG_BLUR_PX}px)`;
+    ctx.drawImage(mask, 0, 0, viewportSize.w, viewportSize.h);
+    ctx.restore();
+  }, [world, view, viewportSize?.w, viewportSize?.h]);
+
   // DOM labels
   const labels = useMemo(() => {
     if (!world || !showLabels) return [];
@@ -403,7 +465,7 @@ export default function MapView({
         position: 'absolute',
         inset: 0,
         overflow: 'hidden',
-        background: '#1e2026',
+        background: FOG_COLOR,
         cursor,
       }}
       onMouseDown={onMouseDown}
@@ -433,6 +495,16 @@ export default function MapView({
           style={{ position: 'absolute', left: 0, top: 0 }}
         />
       </div>
+
+      <canvas
+        ref={fogCanvasRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          pointerEvents: 'none',
+        }}
+      />
 
       {/* Region labels */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>

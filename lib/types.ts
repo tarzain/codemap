@@ -14,7 +14,6 @@ export const BIOME = {
   PEAK: 10,
   VOLCANIC: 11,
   LAVA: 12,
-  FOG: 13,
 } as const;
 
 export type BiomeId = typeof BIOME[keyof typeof BIOME];
@@ -62,6 +61,7 @@ export interface Placement {
 
 export interface World {
   tiles: Uint8Array;
+  visibility: Uint8Array;
   w: number;
   h: number;
   placements: Placement[];
