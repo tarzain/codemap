@@ -273,17 +273,11 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
     }
   }
 
-  return canvas;
-}
-
-// Render a blurred luminance mask of the terrain shape.
-// Returns a data URL suitable for CSS mask-image. Applied at the CSS level
-// (after scaling), so the smooth gradient survives image-rendering: pixelated.
-export function renderFogMaskUrl(world: World): string {
-  const sz = worldPixelSize(world);
+  // Pass 3: smooth fog fade — blur the terrain's own alpha at fog edges
+  // Build a white mask of terrain tiles, blur it, then use destination-in
+  // to fade the terrain canvas alpha. The dark background shows through.
   const BLUR_PX = Math.round(Math.max(world.w, world.h) * 1.8);
 
-  // Build a white mask of all terrain (non-fog) tiles
   const maskCv = document.createElement("canvas");
   maskCv.width = sz.w;
   maskCv.height = sz.h;
@@ -297,7 +291,6 @@ export function renderFogMaskUrl(world: World): string {
     }
   }
 
-  // Blur the mask for a smooth gradient at edges
   const blurCv = document.createElement("canvas");
   blurCv.width = sz.w;
   blurCv.height = sz.h;
@@ -305,7 +298,12 @@ export function renderFogMaskUrl(world: World): string {
   blurCtx.filter = `blur(${BLUR_PX}px)`;
   blurCtx.drawImage(maskCv, 0, 0);
 
-  return blurCv.toDataURL();
+  // Fade terrain alpha using blurred mask
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(blurCv, 0, 0);
+  ctx.globalCompositeOperation = "source-over";
+
+  return canvas;
 }
 
 // Desaturate tiles around merged branches to give them a "ruin" appearance.

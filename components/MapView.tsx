@@ -6,7 +6,6 @@ import {
   hexCenter,
   worldPixelSize,
   renderWorldTerrain,
-  renderFogMaskUrl,
   applyMergedOverlay,
   drawBranchMarker,
   drawHexRing,
@@ -73,7 +72,6 @@ export default function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const [terrainCanvas, setTerrainCanvas] = useState<HTMLCanvasElement | null>(null);
-  const [fogMask, setFogMask] = useState<string | null>(null);
 
   const [view, setView] = useState<ViewState>({ x: 0, y: 0, scale: 1.0 });
   const viewRef = useRef(view);
@@ -124,7 +122,6 @@ export default function MapView({
     const c = renderWorldTerrain(world);
     applyMergedOverlay(c, world);
     setTerrainCanvas(c);
-    setFogMask(renderFogMaskUrl(world));
     console.log('terrain rendered in', (performance.now() - t0).toFixed(0), 'ms');
   }, [world]);
 
@@ -415,7 +412,6 @@ export default function MapView({
       onMouseLeave={onMouseLeave}
       onWheel={onWheel}
     >
-      {/* Terrain + markers, with CSS mask for smooth fog fade */}
       <div
         style={{
           position: 'absolute',
@@ -427,11 +423,7 @@ export default function MapView({
           transformOrigin: '0 0',
           imageRendering: 'pixelated',
           willChange: 'transform',
-          WebkitMaskImage: fogMask ? `url(${fogMask})` : undefined,
-          WebkitMaskSize: '100% 100%',
-          maskImage: fogMask ? `url(${fogMask})` : undefined,
-          maskSize: '100% 100%',
-        } as React.CSSProperties}
+        }}
       >
         <CanvasMirror canvas={terrainCanvas} />
         <canvas
