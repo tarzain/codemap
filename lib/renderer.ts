@@ -276,12 +276,11 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
   return canvas;
 }
 
-// Render the fog-of-war overlay as a separate canvas.
-// This must be displayed with smooth (non-pixelated) image rendering
-// so the gaussian blur is preserved when scaled.
-export function renderFogOverlay(world: World): HTMLCanvasElement {
+// Render a blurred luminance mask of the terrain shape.
+// Returns a data URL suitable for CSS mask-image. Applied at the CSS level
+// (after scaling), so the smooth gradient survives image-rendering: pixelated.
+export function renderFogMaskUrl(world: World): string {
   const sz = worldPixelSize(world);
-  const FOG_COLOR = "#1e2026";
   const BLUR_PX = Math.round(Math.max(world.w, world.h) * 1.8);
 
   // Build a white mask of all terrain (non-fog) tiles
@@ -305,19 +304,8 @@ export function renderFogOverlay(world: World): HTMLCanvasElement {
   const blurCtx = blurCv.getContext("2d")!;
   blurCtx.filter = `blur(${BLUR_PX}px)`;
   blurCtx.drawImage(maskCv, 0, 0);
-  blurCtx.filter = "none";
 
-  // Dark overlay with blurred terrain shape punched out
-  const canvas = document.createElement("canvas");
-  canvas.width = sz.w;
-  canvas.height = sz.h;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = FOG_COLOR;
-  ctx.fillRect(0, 0, sz.w, sz.h);
-  ctx.globalCompositeOperation = "destination-out";
-  ctx.drawImage(blurCv, 0, 0);
-
-  return canvas;
+  return blurCv.toDataURL();
 }
 
 // Desaturate tiles around merged branches to give them a "ruin" appearance.
