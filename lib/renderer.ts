@@ -273,81 +273,48 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
     }
   }
 
-  // Pass 3: fog edge dissolution — dissolve terrain into dark void
-  // Two phases: first darken, then erase individual pixels for a soft dissolve.
-  const FADE_RADIUS = 6;
+  // Pass 3: smooth fog fade using gaussian blur
+  // 1. Build a white mask of all terrain (non-fog) tiles
+  // 2. Blur it to get a smooth alpha gradient at edges
+  // 3. Create a dark overlay, punch out the blurred mask
+  // 4. Draw overlay onto terrain — smoothly darkens edges into void
+  const FOG_COLOR = "#1e2026";
+  const BLUR_PX = Math.round(Math.max(world.w, world.h) * 1.8);
 
-  // Precompute fog distance for each non-fog tile
-  const fogDistMap = new Float32Array(world.w * world.h);
-  fogDistMap.fill(FADE_RADIUS + 1);
+  const maskCv = document.createElement("canvas");
+  maskCv.width = sz.w;
+  maskCv.height = sz.h;
+  const maskCtx = maskCv.getContext("2d")!;
+  maskCtx.fillStyle = "#fff";
   for (let row = 0; row < world.h; row++) {
     for (let col = 0; col < world.w; col++) {
-      const idx = row * world.w + col;
-      if (world.tiles[idx] === BIOMES.FOG) { fogDistMap[idx] = 0; continue; }
-      let best = FADE_RADIUS + 1;
-      const sr = FADE_RADIUS;
-      for (let dy = -sr; dy <= sr && best > 1; dy++) {
-        for (let dx = -sr; dx <= sr; dx++) {
-          const d2 = dx * dx + dy * dy;
-          if (d2 >= best * best) continue;
-          const nx = col + dx, ny = row + dy;
-          if (nx < 0 || nx >= world.w || ny < 0 || ny >= world.h || world.tiles[ny * world.w + nx] === BIOMES.FOG) {
-            const d = Math.sqrt(d2);
-            if (d < best) best = d;
-          }
-        }
-      }
-      fogDistMap[idx] = best;
-    }
-  }
-
-  // Phase A: darken tiles near fog (color shift toward fog void)
-  for (let row = 0; row < world.h; row++) {
-    for (let col = 0; col < world.w; col++) {
-      const fd = fogDistMap[row * world.w + col];
-      if (fd >= FADE_RADIUS || fd === 0) continue;
-      const alpha = Math.pow(1 - fd / FADE_RADIUS, 1.3) * 0.7;
+      if (world.tiles[row * world.w + col] === BIOMES.FOG) continue;
       const [cx, cy] = hexCenter(col, row);
-      const left = cx - HEX_W / 2;
-      const top = cy - HEX_H / 2;
-      ctx.fillStyle = `rgba(30, 32, 38, ${alpha})`;
-      for (let y = 0; y < HEX_H; y++) {
-        const [x0, x1] = HEX_MASK[y];
-        ctx.fillRect(left + x0, top + y, x1 - x0 + 1, 1);
-      }
+      fillHexAt(maskCtx, cx - HEX_W / 2, cy - HEX_H / 2, "#fff");
     }
   }
 
-  // Phase B: per-pixel dissolve (erase pixels to break hex structure)
-  ctx.save();
-  ctx.globalCompositeOperation = "destination-out";
-  ctx.fillStyle = "rgba(0,0,0,1)";
-  for (let row = 0; row < world.h; row++) {
-    for (let col = 0; col < world.w; col++) {
-      const fd = fogDistMap[row * world.w + col];
-      if (fd >= FADE_RADIUS || fd === 0) continue;
-      // visibility: 1 = fully visible, 0 = fully erased
-      const visibility = fd / FADE_RADIUS;
-      const [cx, cy] = hexCenter(col, row);
-      const left = cx - HEX_W / 2;
-      const top = cy - HEX_H / 2;
-      for (let y = 0; y < HEX_H; y++) {
-        const [x0, x1] = HEX_MASK[y];
-        for (let x = x0; x <= x1; x++) {
-          const px = left + x, py = top + y;
-          // Stable per-pixel noise hash
-          let h = px * 73856093 ^ py * 19349663 ^ 83492791;
-          h = (h ^ (h >>> 13)) >>> 0;
-          h = Math.imul(h, 0x5bd1e995) >>> 0;
-          const n = ((h ^ (h >>> 15)) >>> 0) / 4294967296;
-          if (n > visibility) {
-            ctx.fillRect(px, py, 1, 1);
-          }
-        }
-      }
-    }
-  }
-  ctx.restore();
+  // Blur the mask
+  const blurCv = document.createElement("canvas");
+  blurCv.width = sz.w;
+  blurCv.height = sz.h;
+  const blurCtx = blurCv.getContext("2d")!;
+  blurCtx.filter = `blur(${BLUR_PX}px)`;
+  blurCtx.drawImage(maskCv, 0, 0);
+  blurCtx.filter = "none";
+
+  // Create dark overlay, cut out blurred terrain shape
+  const darkCv = document.createElement("canvas");
+  darkCv.width = sz.w;
+  darkCv.height = sz.h;
+  const darkCtx = darkCv.getContext("2d")!;
+  darkCtx.fillStyle = FOG_COLOR;
+  darkCtx.fillRect(0, 0, sz.w, sz.h);
+  darkCtx.globalCompositeOperation = "destination-out";
+  darkCtx.drawImage(blurCv, 0, 0);
+
+  // Draw the dark overlay on top of terrain
+  ctx.drawImage(darkCv, 0, 0);
 
   return canvas;
 }
