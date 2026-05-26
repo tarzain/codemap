@@ -661,19 +661,18 @@ body.cm-drop-active::after {
 .cm-region-label {
   position: absolute;
   transform: translate(-50%, -50%);
-  color: rgba(20, 18, 14, 0.78);
+  padding: 3px 8px 4px;
+  background: rgba(253, 250, 242, 0.68);
+  color: rgba(20, 18, 14, 0.82);
   font: 700 16px var(--sans);
-  letter-spacing: 0.22em;
+  letter-spacing: 0;
   text-transform: uppercase;
   white-space: nowrap;
+  border-radius: 5px;
+  border: 1px solid rgba(20, 18, 14, 0.1);
+  box-shadow: 0 1px 4px rgba(20, 18, 14, 0.16);
   pointer-events: none;
   user-select: none;
-  text-shadow:
-    -1px -1px 0 rgba(253, 250, 242, 0.6),
-     1px -1px 0 rgba(253, 250, 242, 0.6),
-    -1px  1px 0 rgba(253, 250, 242, 0.6),
-     1px  1px 0 rgba(253, 250, 242, 0.6),
-     0 1px 3px rgba(253, 250, 242, 0.5);
-  mix-blend-mode: multiply;
+  text-shadow: 0 1px 0 rgba(253, 250, 242, 0.4);
   transition: opacity 0.12s, font-size 0.12s;
 }
