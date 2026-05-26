@@ -6,6 +6,7 @@ import {
   hexCenter,
   worldPixelSize,
   renderWorldTerrain,
+  renderFogOverlay,
   applyMergedOverlay,
   drawBranchMarker,
   drawHexRing,
@@ -72,6 +73,7 @@ export default function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
   const [terrainCanvas, setTerrainCanvas] = useState<HTMLCanvasElement | null>(null);
+  const [fogCanvas, setFogCanvas] = useState<HTMLCanvasElement | null>(null);
 
   const [view, setView] = useState<ViewState>({ x: 0, y: 0, scale: 1.0 });
   const viewRef = useRef(view);
@@ -122,6 +124,7 @@ export default function MapView({
     const c = renderWorldTerrain(world);
     applyMergedOverlay(c, world);
     setTerrainCanvas(c);
+    setFogCanvas(renderFogOverlay(world));
     console.log('terrain rendered in', (performance.now() - t0).toFixed(0), 'ms');
   }, [world]);
 
@@ -412,6 +415,7 @@ export default function MapView({
       onMouseLeave={onMouseLeave}
       onWheel={onWheel}
     >
+      {/* Pixelated layer: terrain tiles + marker overlay */}
       <div
         style={{
           position: 'absolute',
@@ -433,6 +437,24 @@ export default function MapView({
           style={{ position: 'absolute', left: 0, top: 0, imageRendering: 'pixelated' }}
         />
       </div>
+      {/* Smooth layer: fog overlay (gaussian blur must not be pixelated) */}
+      {fogCanvas && (
+        <div
+          style={{
+            position: 'absolute',
+            left: 0,
+            top: 0,
+            width: ws.w,
+            height: ws.h,
+            transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`,
+            transformOrigin: '0 0',
+            pointerEvents: 'none',
+            willChange: 'transform',
+          }}
+        >
+          <CanvasMirror canvas={fogCanvas} />
+        </div>
+      )}
 
       {/* Region labels */}
       <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>

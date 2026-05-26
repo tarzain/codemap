@@ -273,14 +273,18 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
     }
   }
 
-  // Pass 3: smooth fog fade using gaussian blur
-  // 1. Build a white mask of all terrain (non-fog) tiles
-  // 2. Blur it to get a smooth alpha gradient at edges
-  // 3. Create a dark overlay, punch out the blurred mask
-  // 4. Draw overlay onto terrain — smoothly darkens edges into void
+  return canvas;
+}
+
+// Render the fog-of-war overlay as a separate canvas.
+// This must be displayed with smooth (non-pixelated) image rendering
+// so the gaussian blur is preserved when scaled.
+export function renderFogOverlay(world: World): HTMLCanvasElement {
+  const sz = worldPixelSize(world);
   const FOG_COLOR = "#1e2026";
   const BLUR_PX = Math.round(Math.max(world.w, world.h) * 1.8);
 
+  // Build a white mask of all terrain (non-fog) tiles
   const maskCv = document.createElement("canvas");
   maskCv.width = sz.w;
   maskCv.height = sz.h;
@@ -294,7 +298,7 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
     }
   }
 
-  // Blur the mask
+  // Blur the mask for a smooth gradient at edges
   const blurCv = document.createElement("canvas");
   blurCv.width = sz.w;
   blurCv.height = sz.h;
@@ -303,18 +307,15 @@ export function renderWorldTerrain(world: World): HTMLCanvasElement {
   blurCtx.drawImage(maskCv, 0, 0);
   blurCtx.filter = "none";
 
-  // Create dark overlay, cut out blurred terrain shape
-  const darkCv = document.createElement("canvas");
-  darkCv.width = sz.w;
-  darkCv.height = sz.h;
-  const darkCtx = darkCv.getContext("2d")!;
-  darkCtx.fillStyle = FOG_COLOR;
-  darkCtx.fillRect(0, 0, sz.w, sz.h);
-  darkCtx.globalCompositeOperation = "destination-out";
-  darkCtx.drawImage(blurCv, 0, 0);
-
-  // Draw the dark overlay on top of terrain
-  ctx.drawImage(darkCv, 0, 0);
+  // Dark overlay with blurred terrain shape punched out
+  const canvas = document.createElement("canvas");
+  canvas.width = sz.w;
+  canvas.height = sz.h;
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = FOG_COLOR;
+  ctx.fillRect(0, 0, sz.w, sz.h);
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.drawImage(blurCv, 0, 0);
 
   return canvas;
 }
