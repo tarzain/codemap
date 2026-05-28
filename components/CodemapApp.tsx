@@ -1,9 +1,15 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import { generateWorld } from '@/lib/mapgen';
-import MapView from './MapView';
-import { useTweaks, TweaksPanel, TweakSection, TweakNumber, TweakToggle } from './TweaksPanel';
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { generateWorld } from "@/lib/mapgen";
+import MapView from "./MapView";
+import {
+  useTweaks,
+  TweaksPanel,
+  TweakSection,
+  TweakNumber,
+  TweakToggle,
+} from "./TweaksPanel";
 import {
   entryKind,
   entryStatus,
@@ -14,50 +20,55 @@ import {
   type EntryKind,
   type SuggestedBranchPayload,
   type World,
-} from '@/lib/types';
+} from "@/lib/types";
 
 const STATUS_COLOR: Record<BranchStatus, string> = {
-  open: '#3a82c4',
-  draft: '#9a8a6a',
-  merged: '#7aa648',
-  stale: '#7d7569',
-  protected: '#d4a23a',
-  release: '#9a5ac4',
+  open: "#3a82c4",
+  draft: "#9a8a6a",
+  merged: "#7aa648",
+  stale: "#7d7569",
+  protected: "#d4a23a",
+  release: "#9a5ac4",
 };
 
-const KIND_COLOR: Record<Exclude<EntryKind, 'branch'>, string> = {
-  suggested: '#b088d0',
-  milestone: '#9a5ac4',
-  hotpatch: '#d4583a',
+const KIND_COLOR: Record<Exclude<EntryKind, "branch">, string> = {
+  suggested: "#b088d0",
+  milestone: "#9a5ac4",
+  hotpatch: "#d4583a",
 };
 
 type AssistantState =
-  | { status: 'idle' }
-  | { status: 'loading'; command: string }
-  | { status: 'result'; command: string; result: CodemapAssistantResult }
-  | { status: 'error'; command: string; error: string };
+  | { status: "idle" }
+  | { status: "loading"; command: string }
+  | { status: "result"; command: string; result: CodemapAssistantResult }
+  | { status: "error"; command: string; error: string };
 
 const FALLBACK_CODEMAP: CodemapData = {
-  $schema: 'codemap@1',
-  name: 'demo',
+  $schema: "codemap@1",
+  name: "demo",
   seed: 1337,
-  head: 'main',
+  head: "main",
   regions: {
-    capital: { label: 'Mainline', biome: 'plains', center: [0, 0], spread: 0.5 },
+    capital: {
+      label: "Mainline",
+      biome: "plains",
+      center: [0, 0],
+      spread: 0.5,
+    },
   },
   branches: [
     {
-      name: 'main',
-      region: 'capital',
-      kind: 'branch',
-      icon: 'castle',
-      author: 'team',
+      name: "main",
+      region: "capital",
+      kind: "branch",
+      icon: "castle",
+      author: "team",
       commits: 0,
-      status: 'protected',
+      status: "protected",
       ahead: 0,
       behind: 0,
-      lastCommit: '—',
-      message: '—',
+      lastCommit: "—",
+      message: "—",
       pr: null,
       reviewers: [],
     },
@@ -65,19 +76,27 @@ const FALLBACK_CODEMAP: CodemapData = {
 };
 
 export default function CodemapApp() {
-  const [t, setTweak] = useTweaks({ seed: null as number | null, showLabels: true });
+  const [t, setTweak] = useTweaks({
+    seed: null as number | null,
+    showLabels: true,
+  });
 
   const [codemap, setCodemap] = useState<CodemapData | null>(null);
   const [transientBranches, setTransientBranches] = useState<Branch[]>([]);
-  const [assistantState, setAssistantState] = useState<AssistantState>({ status: 'idle' });
+  const [assistantState, setAssistantState] = useState<AssistantState>({
+    status: "idle",
+  });
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [importMessage, setImportMessage] = useState<{ type: string; text: string } | null>(null);
+  const [importMessage, setImportMessage] = useState<{
+    type: string;
+    text: string;
+  } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
 
   useEffect(() => {
-    fetch('/samples/acme-codemap.json')
+    fetch("/samples/anthropic-sdk-python-codemap.json")
       .then((r) => {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
+        if (!r.ok) throw new Error("HTTP " + r.status);
         return r.json();
       })
       .then((json) => {
@@ -85,9 +104,11 @@ export default function CodemapApp() {
         setLoadError(null);
       })
       .catch((err) => {
-        console.warn('Could not load default codemap, using fallback:', err);
+        console.warn("Could not load default codemap, using fallback:", err);
         setCodemap(FALLBACK_CODEMAP);
-        setLoadError('Default codemap couldn\'t load. Using fallback. Upload a JSON to view another codebase.');
+        setLoadError(
+          "Default codemap couldn't load. Using fallback. Upload a JSON to view another codebase.",
+        );
       });
   }, []);
 
@@ -100,7 +121,8 @@ export default function CodemapApp() {
     };
   }, [codemap, transientBranches]);
 
-  const effectiveSeed = ((t.seed ?? effectiveCodemap?.seed ?? 1337) | 0) as number;
+  const effectiveSeed = ((t.seed ?? effectiveCodemap?.seed ?? 1337) |
+    0) as number;
   const world = useMemo<World | null>(() => {
     if (!effectiveCodemap) return null;
     return generateWorld({ ...effectiveCodemap, seed: effectiveSeed });
@@ -108,13 +130,22 @@ export default function CodemapApp() {
 
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
-  const [focusBranch, setFocusBranch] = useState<{ name: string; ts: number } | null>(null);
-  const [query, setQuery] = useState('');
+  const [focusBranch, setFocusBranch] = useState<{
+    name: string;
+    ts: number;
+  } | null>(null);
+  const [query, setQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState(new Set<string>());
   const [statusFilter, setStatusFilter] = useState<BranchStatus | null>(null);
-  const [kindFilter, setKindFilter] = useState<Exclude<EntryKind, 'branch'> | null>(null);
+  const [kindFilter, setKindFilter] = useState<Exclude<
+    EntryKind,
+    "branch"
+  > | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [viewportSize, setViewportSize] = useState<{ w: number; h: number } | null>(null);
+  const [viewportSize, setViewportSize] = useState<{
+    w: number;
+    h: number;
+  } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -130,18 +161,18 @@ export default function CodemapApp() {
       }
     }
     onResize();
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   useEffect(() => {
     setSelected(null);
-    setQuery('');
+    setQuery("");
     setActiveFilters(new Set());
     setStatusFilter(null);
     setKindFilter(null);
     setTransientBranches([]);
-    setAssistantState({ status: 'idle' });
+    setAssistantState({ status: "idle" });
   }, [codemap]);
 
   const dimmedSet = useMemo(() => {
@@ -149,7 +180,8 @@ export default function CodemapApp() {
     const hasFilter = activeFilters.size > 0;
     const hasStatus = !!statusFilter;
     const hasKind = !!kindFilter;
-    if (!hasQuery && !hasFilter && !hasStatus && !hasKind) return new Set<string>();
+    if (!hasQuery && !hasFilter && !hasStatus && !hasKind)
+      return new Set<string>();
     const dim = new Set<string>();
     for (const b of branches) {
       let visible = true;
@@ -157,10 +189,10 @@ export default function CodemapApp() {
         const q = query.toLowerCase();
         visible =
           b.name.toLowerCase().includes(q) ||
-          (b.author || '').toLowerCase().includes(q) ||
-          (b.message || '').toLowerCase().includes(q) ||
-          (b.pr || '').toLowerCase().includes(q) ||
-          (regions[b.region]?.label || '').toLowerCase().includes(q);
+          (b.author || "").toLowerCase().includes(q) ||
+          (b.message || "").toLowerCase().includes(q) ||
+          (b.pr || "").toLowerCase().includes(q) ||
+          (regions[b.region]?.label || "").toLowerCase().includes(q);
       }
       if (visible && hasFilter) visible = activeFilters.has(b.region);
       if (visible && hasStatus) visible = entryStatus(b) === statusFilter;
@@ -172,10 +204,12 @@ export default function CodemapApp() {
 
   const matchingBranches = useMemo(
     () => branches.filter((b) => !dimmedSet.has(b.name)),
-    [dimmedSet, branches]
+    [dimmedSet, branches],
   );
 
-  const selectedBranchObj = selected ? branches.find((b) => b.name === selected) : null;
+  const selectedBranchObj = selected
+    ? branches.find((b) => b.name === selected)
+    : null;
 
   const handleSelect = (name: string | null) => {
     setSelected(name);
@@ -184,35 +218,35 @@ export default function CodemapApp() {
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
-    if (assistantState.status !== 'idle') setAssistantState({ status: 'idle' });
+    if (assistantState.status !== "idle") setAssistantState({ status: "idle" });
   };
 
   // Drag-and-drop JSON
   useEffect(() => {
     function onDragOver(e: DragEvent) {
-      if (e.dataTransfer?.types?.includes('Files')) {
+      if (e.dataTransfer?.types?.includes("Files")) {
         e.preventDefault();
-        document.body.classList.add('cm-drop-active');
+        document.body.classList.add("cm-drop-active");
       }
     }
     function onDragLeave(e: DragEvent) {
       if (e.target === document || e.relatedTarget === null) {
-        document.body.classList.remove('cm-drop-active');
+        document.body.classList.remove("cm-drop-active");
       }
     }
     function onDrop(e: DragEvent) {
       e.preventDefault();
-      document.body.classList.remove('cm-drop-active');
+      document.body.classList.remove("cm-drop-active");
       const file = e.dataTransfer?.files?.[0];
       if (file) loadFile(file);
     }
-    window.addEventListener('dragover', onDragOver);
-    window.addEventListener('dragleave', onDragLeave);
-    window.addEventListener('drop', onDrop);
+    window.addEventListener("dragover", onDragOver);
+    window.addEventListener("dragleave", onDragLeave);
+    window.addEventListener("drop", onDrop);
     return () => {
-      window.removeEventListener('dragover', onDragOver);
-      window.removeEventListener('dragleave', onDragLeave);
-      window.removeEventListener('drop', onDrop);
+      window.removeEventListener("dragover", onDragOver);
+      window.removeEventListener("dragleave", onDragLeave);
+      window.removeEventListener("drop", onDrop);
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -225,16 +259,19 @@ export default function CodemapApp() {
         const valid = validateCodemap(json);
         if (valid.ok) {
           setCodemap(json);
-          setTweak('seed', null);
+          setTweak("seed", null);
           setImportMessage({
-            type: 'success',
+            type: "success",
             text: `Loaded "${json.name || file.name}" — ${json.branches.length} branches.`,
           });
         } else {
-          setImportMessage({ type: 'error', text: valid.error! });
+          setImportMessage({ type: "error", text: valid.error! });
         }
       } catch (err) {
-        setImportMessage({ type: 'error', text: `Invalid JSON: ${(err as Error).message}` });
+        setImportMessage({
+          type: "error",
+          text: `Invalid JSON: ${(err as Error).message}`,
+        });
       }
       setTimeout(() => setImportMessage(null), 4500);
     };
@@ -242,19 +279,27 @@ export default function CodemapApp() {
   }
 
   function loadSample(path: string) {
-    fetch('/' + path)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))))
+    fetch("/" + path)
+      .then((r) =>
+        r.ok ? r.json() : Promise.reject(new Error("HTTP " + r.status)),
+      )
       .then((json: CodemapData) => {
         const valid = validateCodemap(json);
         if (!valid.ok) throw new Error(valid.error);
         setCodemap(json);
-        setTweak('seed', null);
+        setTweak("seed", null);
         setHelpOpen(false);
-        setImportMessage({ type: 'success', text: `Loaded "${json.name}" — ${json.branches.length} branches.` });
+        setImportMessage({
+          type: "success",
+          text: `Loaded "${json.name}" — ${json.branches.length} branches.`,
+        });
         setTimeout(() => setImportMessage(null), 4500);
       })
       .catch((err: Error) => {
-        setImportMessage({ type: 'error', text: `Couldn't load sample: ${err.message}` });
+        setImportMessage({
+          type: "error",
+          text: `Couldn't load sample: ${err.message}`,
+        });
         setTimeout(() => setImportMessage(null), 4500);
       });
   }
@@ -262,11 +307,11 @@ export default function CodemapApp() {
   function downloadJSON() {
     if (!codemap) return;
     const json = JSON.stringify(codemap, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
+    const blob = new Blob([json], { type: "application/json" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `${(codemap.name || 'codemap').replace(/[\/\\]/g, '-')}.codemap.json`;
+    a.download = `${(codemap.name || "codemap").replace(/[\/\\]/g, "-")}.codemap.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -282,9 +327,9 @@ export default function CodemapApp() {
     const command = checkoutCommandForBranch(branch.name);
     try {
       await copyText(command);
-      showToast('success', `Copied: ${command}`);
+      showToast("success", `Copied: ${command}`);
     } catch {
-      showToast('error', 'Could not copy checkout command.');
+      showToast("error", "Could not copy checkout command.");
     }
   }
 
@@ -292,9 +337,9 @@ export default function CodemapApp() {
     const prompt = claudeCodePromptForSuggestedBranch(branch);
     try {
       await copyText(prompt);
-      showToast('success', 'Copied Claude Code prompt.');
+      showToast("success", "Copied Claude Code prompt.");
     } catch {
-      showToast('error', 'Could not copy Claude Code prompt.');
+      showToast("error", "Could not copy Claude Code prompt.");
     }
   }
 
@@ -302,89 +347,111 @@ export default function CodemapApp() {
     if (!codemap) return;
     const url = pullRequestUrl(codemap, branch);
     if (!url) {
-      showToast('info', 'No GitHub remote URL is configured for this codemap.');
+      showToast("info", "No GitHub remote URL is configured for this codemap.");
       return;
     }
-    window.open(url, '_blank', 'noopener,noreferrer');
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
   async function submitAssistantQuery() {
     const command = query.trim();
-    if (!command || !effectiveCodemap || assistantState.status === 'loading') return;
+    if (!command || !effectiveCodemap || assistantState.status === "loading")
+      return;
 
-    setAssistantState({ status: 'loading', command });
+    setAssistantState({ status: "loading", command });
     try {
-      const response = await fetch('/api/codemap/query', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
+      const response = await fetch("/api/codemap/query", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({ command, codemap: effectiveCodemap }),
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || 'Claude request failed.');
+      if (!response.ok)
+        throw new Error(payload.error || "Claude request failed.");
 
-      const result = normalizeAssistantResult(payload as CodemapAssistantResult, branches, regions);
-      if (result.action === 'link_existing') {
-        setAssistantState({ status: 'result', command, result });
+      const result = normalizeAssistantResult(
+        payload as CodemapAssistantResult,
+        branches,
+        regions,
+      );
+      if (result.action === "link_existing") {
+        setAssistantState({ status: "result", command, result });
         return;
       }
 
-      if (result.action === 'create_suggested') {
-        const existing = branches.find((branch) => branch.name === result.targetName);
+      if (result.action === "create_suggested") {
+        const existing = branches.find(
+          (branch) => branch.name === result.targetName,
+        );
         if (existing) {
           const linkResult: CodemapAssistantResult = {
-            action: 'link_existing',
+            action: "link_existing",
             message: result.message,
             targetName: existing.name,
+            targetNames: [existing.name],
             suggestedBranch: emptySuggestedBranch(),
           };
-          setAssistantState({ status: 'result', command, result: linkResult });
+          setAssistantState({ status: "result", command, result: linkResult });
           handleSelect(existing.name);
           return;
         }
 
         const branch = suggestedPayloadToBranch(result.suggestedBranch);
         setTransientBranches((prev) => [...prev, branch]);
-        setAssistantState({ status: 'result', command, result });
+        setAssistantState({ status: "result", command, result });
         handleSelect(branch.name);
         return;
       }
 
-      setAssistantState({ status: 'result', command, result });
+      setAssistantState({ status: "result", command, result });
     } catch (error) {
       setAssistantState({
-        status: 'error',
+        status: "error",
         command,
-        error: (error as Error).message || 'Claude request failed.',
+        error: (error as Error).message || "Claude request failed.",
       });
     }
   }
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === '/' && (document.activeElement as HTMLElement)?.tagName !== 'INPUT') {
+      if (
+        e.key === "/" &&
+        (document.activeElement as HTMLElement)?.tagName !== "INPUT"
+      ) {
         e.preventDefault();
-        document.getElementById('codemap-search')?.focus();
+        document.getElementById("codemap-search")?.focus();
       }
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         setSelected(null);
-        setQuery('');
+        setQuery("");
         setHelpOpen(false);
         (document.activeElement as HTMLElement)?.blur();
       }
-      if (e.key === '?' && (document.activeElement as HTMLElement)?.tagName !== 'INPUT') {
+      if (
+        e.key === "?" &&
+        (document.activeElement as HTMLElement)?.tagName !== "INPUT"
+      ) {
         e.preventDefault();
         setHelpOpen((v) => !v);
       }
     }
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   if (!codemap) {
     return (
       <div ref={rootRef} className="cm-root cm-loading">
         <div className="cm-spinner" />
-        <div style={{ marginTop: 12, color: '#a8a89c', fontFamily: 'var(--mono)', fontSize: 12 }}>
+        <div
+          style={{
+            marginTop: 12,
+            color: "#a8a89c",
+            fontFamily: "var(--mono)",
+            fontSize: 12,
+          }}
+        >
           loading codemap…
         </div>
       </div>
@@ -433,7 +500,9 @@ export default function CodemapApp() {
       {selectedBranchObj && (
         <BranchPopup
           branch={selectedBranchObj}
-          regionLabel={regions[selectedBranchObj.region]?.label || selectedBranchObj.region}
+          regionLabel={
+            regions[selectedBranchObj.region]?.label || selectedBranchObj.region
+          }
           branches={branches}
           pullRequestUrl={pullRequestUrl(codemap, selectedBranchObj)}
           onClose={() => setSelected(null)}
@@ -454,36 +523,51 @@ export default function CodemapApp() {
       />
 
       <StatusBar
-        hovered={hovered ? branches.find((b) => b.name === hovered) || null : null}
+        hovered={
+          hovered ? branches.find((b) => b.name === hovered) || null : null
+        }
         matchCount={matchingBranches.length}
         totalCount={branches.length}
-        hasFilters={query.length > 0 || activeFilters.size > 0 || !!statusFilter || !!kindFilter}
+        hasFilters={
+          query.length > 0 ||
+          activeFilters.size > 0 ||
+          !!statusFilter ||
+          !!kindFilter
+        }
         currentCheckout={currentCheckout}
         repoName={codemap.name}
         onJumpToCheckout={() =>
-          currentCheckout && setFocusBranch({ name: currentCheckout, ts: Date.now() })
+          currentCheckout &&
+          setFocusBranch({ name: currentCheckout, ts: Date.now() })
         }
       />
 
       {importMessage && (
-        <div className={`cm-toast cm-toast--${importMessage.type}`}>{importMessage.text}</div>
+        <div className={`cm-toast cm-toast--${importMessage.type}`}>
+          {importMessage.text}
+        </div>
       )}
 
       {loadError && !importMessage && (
         <div className="cm-toast cm-toast--info">{loadError}</div>
       )}
 
-      {helpOpen && <HelpOverlay onClose={() => setHelpOpen(false)} onLoadSample={loadSample} />}
+      {helpOpen && (
+        <HelpOverlay
+          onClose={() => setHelpOpen(false)}
+          onLoadSample={loadSample}
+        />
+      )}
 
       <input
         ref={fileInputRef}
         type="file"
         accept=".json,application/json"
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         onChange={(e) => {
           const f = e.target.files?.[0];
           if (f) loadFile(f);
-          e.target.value = '';
+          e.target.value = "";
         }}
       />
 
@@ -492,7 +576,7 @@ export default function CodemapApp() {
           <TweakNumber
             label="Seed"
             value={effectiveSeed}
-            onChange={(v) => setTweak('seed', v)}
+            onChange={(v) => setTweak("seed", v)}
             min={0}
             max={9999}
             step={1}
@@ -500,7 +584,7 @@ export default function CodemapApp() {
           <TweakToggle
             label="Show branch labels"
             value={t.showLabels}
-            onChange={(v) => setTweak('showLabels', v)}
+            onChange={(v) => setTweak("showLabels", v)}
           />
         </TweakSection>
       </TweaksPanel>
@@ -508,36 +592,67 @@ export default function CodemapApp() {
   );
 
   function zoomBy(factor: number) {
-    window.dispatchEvent(new CustomEvent('codemap-zoom', { detail: { factor } }));
+    window.dispatchEvent(
+      new CustomEvent("codemap-zoom", { detail: { factor } }),
+    );
   }
 }
 
 // === Codemap JSON validation ===
-const VALID_KINDS: EntryKind[] = ['branch', 'milestone', 'hotpatch', 'suggested'];
-const VALID_STATUSES: BranchStatus[] = ['open', 'draft', 'merged', 'stale', 'protected', 'release'];
+const VALID_KINDS: EntryKind[] = [
+  "branch",
+  "milestone",
+  "hotpatch",
+  "suggested",
+];
+const VALID_STATUSES: BranchStatus[] = [
+  "open",
+  "draft",
+  "merged",
+  "stale",
+  "protected",
+  "release",
+];
 
 function validateCodemap(json: unknown): { ok: boolean; error?: string } {
-  if (!json || typeof json !== 'object') return { ok: false, error: 'Not an object.' };
+  if (!json || typeof json !== "object")
+    return { ok: false, error: "Not an object." };
   const j = json as Record<string, unknown>;
-  if (!Array.isArray(j.branches)) return { ok: false, error: "Missing 'branches' array." };
-  if (!j.regions || typeof j.regions !== 'object')
+  if (!Array.isArray(j.branches))
+    return { ok: false, error: "Missing 'branches' array." };
+  if (!j.regions || typeof j.regions !== "object")
     return { ok: false, error: "Missing 'regions' object." };
   for (const [k, r] of Object.entries(j.regions as Record<string, unknown>)) {
     const region = r as Record<string, unknown>;
-    if (!region.biome) return { ok: false, error: `Region "${k}" missing biome.` };
+    if (!region.biome)
+      return { ok: false, error: `Region "${k}" missing biome.` };
   }
   for (const b of j.branches as Array<Record<string, unknown>>) {
     if (!b.name) return { ok: false, error: "Branch missing 'name'." };
-    if (!b.region) return { ok: false, error: `Branch "${b.name}" missing 'region'.` };
+    if (!b.region)
+      return { ok: false, error: `Branch "${b.name}" missing 'region'.` };
     if (!(j.regions as Record<string, unknown>)[b.region as string])
-      return { ok: false, error: `Branch "${b.name}" references unknown region "${b.region}".` };
-    if (!b.kind) return { ok: false, error: `Branch "${b.name}" missing 'kind'.` };
+      return {
+        ok: false,
+        error: `Branch "${b.name}" references unknown region "${b.region}".`,
+      };
+    if (!b.kind)
+      return { ok: false, error: `Branch "${b.name}" missing 'kind'.` };
     const kind = b.kind as EntryKind;
     if (!VALID_KINDS.includes(kind))
-      return { ok: false, error: `Branch "${b.name}" has invalid kind "${String(b.kind)}".` };
-    if (b.status !== undefined && !VALID_STATUSES.includes(b.status as BranchStatus))
-      return { ok: false, error: `Branch "${b.name}" has invalid status "${String(b.status)}".` };
-    if (kind === 'branch' && !b.status)
+      return {
+        ok: false,
+        error: `Branch "${b.name}" has invalid kind "${String(b.kind)}".`,
+      };
+    if (
+      b.status !== undefined &&
+      !VALID_STATUSES.includes(b.status as BranchStatus)
+    )
+      return {
+        ok: false,
+        error: `Branch "${b.name}" has invalid status "${String(b.status)}".`,
+      };
+    if (kind === "branch" && !b.status)
       return { ok: false, error: `Branch "${b.name}" missing 'status'.` };
   }
   return { ok: true };
@@ -545,110 +660,186 @@ function validateCodemap(json: unknown): { ok: boolean; error?: string } {
 
 function entryDisplayColor(branch: Branch): string {
   const kind = entryKind(branch);
-  if (kind !== 'branch') return KIND_COLOR[kind];
+  if (kind !== "branch") return KIND_COLOR[kind];
   const status = entryStatus(branch);
-  return status ? STATUS_COLOR[status] : '#888';
+  return status ? STATUS_COLOR[status] : "#888";
 }
 
 function entryDisplayLabel(branch: Branch): string {
   const kind = entryKind(branch);
-  if (kind !== 'branch') return capitalize(kind);
+  if (kind !== "branch") return capitalize(kind);
   const status = entryStatus(branch);
-  return status ? capitalize(status) : 'Branch';
+  return status ? capitalize(status) : "Branch";
 }
 
 function normalizeAssistantResult(
   result: CodemapAssistantResult,
   branches: Branch[],
-  regions: CodemapData['regions']
+  regions: CodemapData["regions"],
 ): CodemapAssistantResult {
-  if (result.action === 'link_existing') {
-    if (!branches.some((branch) => branch.name === result.targetName)) {
+  const branchNames = new Set(branches.map((branch) => branch.name));
+  if (result.action === "link_existing") {
+    const targetNames = validAssistantTargets(result, branchNames);
+    if (targetNames.length === 0) {
       return {
-        action: 'answer',
-        message: `Claude referenced "${result.targetName}", but that entry is not on this map.`,
-        targetName: '',
-        suggestedBranch: emptySuggestedBranch(),
-      };
-    }
-    return { ...result, suggestedBranch: emptySuggestedBranch() };
-  }
-
-  if (result.action === 'create_suggested') {
-    const branch = normalizeSuggestedPayload(result.suggestedBranch);
-    if (!branch.name) throw new Error('Claude returned a suggested branch without a name.');
-    if (!regions[branch.region]) {
-      return {
-        action: 'answer',
-        message: `Claude suggested region "${branch.region}", but that region is not on this map.`,
-        targetName: '',
+        action: "answer",
+        message: "Claude referenced entries that are not on this map.",
+        targetName: "",
+        targetNames: [],
         suggestedBranch: emptySuggestedBranch(),
       };
     }
     return {
-      action: 'create_suggested',
+      ...result,
+      targetName: targetNames[0],
+      targetNames,
+      suggestedBranch: emptySuggestedBranch(),
+    };
+  }
+
+  if (result.action === "create_suggested") {
+    const branch = normalizeSuggestedPayload(result.suggestedBranch);
+    if (!branch.name)
+      throw new Error("Claude returned a suggested branch without a name.");
+    if (!regions[branch.region]) {
+      return {
+        action: "answer",
+        message: `Claude suggested region "${branch.region}", but that region is not on this map.`,
+        targetName: "",
+        targetNames: [],
+        suggestedBranch: emptySuggestedBranch(),
+      };
+    }
+    return {
+      action: "create_suggested",
       message: result.message || `Created suggested branch "${branch.name}".`,
       targetName: branch.name,
+      targetNames: [branch.name],
       suggestedBranch: branch,
     };
   }
 
   return {
-    action: 'answer',
-    message: result.message || 'Claude returned an answer.',
-    targetName: '',
+    action: "answer",
+    message: result.message || "Claude returned an answer.",
+    targetName: "",
+    targetNames: [],
     suggestedBranch: emptySuggestedBranch(),
   };
 }
 
-function normalizeSuggestedPayload(branch: SuggestedBranchPayload): SuggestedBranchPayload {
-  const position = Array.isArray(branch.position) && branch.position.length >= 2
-    ? [Number(branch.position[0]) || 0, Number(branch.position[1]) || 0]
-    : [0, 0];
+function validAssistantTargets(
+  result: CodemapAssistantResult,
+  branchNames: Set<string>,
+): string[] {
+  const names = Array.isArray(result.targetNames) ? result.targetNames : [];
+  const allNames = [...names, result.targetName].filter(
+    (name) => typeof name === "string",
+  );
+  const seen = new Set<string>();
+  const valid: string[] = [];
+  for (const name of allNames) {
+    if (!branchNames.has(name) || seen.has(name)) continue;
+    seen.add(name);
+    valid.push(name);
+    if (valid.length >= 8) break;
+  }
+  return valid;
+}
+
+function normalizeSuggestedPayload(
+  branch: SuggestedBranchPayload,
+): SuggestedBranchPayload {
+  const position =
+    Array.isArray(branch.position) && branch.position.length >= 2
+      ? [Number(branch.position[0]) || 0, Number(branch.position[1]) || 0]
+      : [0, 0];
 
   return {
-    name: String(branch.name || '').trim(),
-    region: String(branch.region || '').trim(),
+    name: String(branch.name || "").trim(),
+    region: String(branch.region || "").trim(),
     position: position as [number, number],
-    icon: String(branch.icon || 'tent').trim() || 'tent',
-    author: String(branch.author || '—').trim() || '—',
+    icon: String(branch.icon || "tent").trim() || "tent",
+    author: String(branch.author || "—").trim() || "—",
     commits: Number.isFinite(branch.commits) ? branch.commits : 0,
     ahead: Number.isFinite(branch.ahead) ? branch.ahead : 0,
     behind: Number.isFinite(branch.behind) ? branch.behind : 0,
-    lastCommit: String(branch.lastCommit || '—').trim() || '—',
-    message: String(branch.message || branch.name || '').trim(),
-    reviewers: Array.isArray(branch.reviewers) ? branch.reviewers.map(String) : [],
+    lastCommit: String(branch.lastCommit || "—").trim() || "—",
+    message: String(branch.message || branch.name || "").trim(),
+    reviewers: Array.isArray(branch.reviewers)
+      ? branch.reviewers.map(String)
+      : [],
   };
 }
 
 function suggestedPayloadToBranch(branch: SuggestedBranchPayload): Branch {
   return {
     ...normalizeSuggestedPayload(branch),
-    kind: 'suggested',
+    kind: "suggested",
     pr: null,
   };
 }
 
 function emptySuggestedBranch(): SuggestedBranchPayload {
   return {
-    name: '',
-    region: '',
+    name: "",
+    region: "",
     position: [0, 0],
-    icon: 'tent',
-    author: '—',
+    icon: "tent",
+    author: "—",
     commits: 0,
     ahead: 0,
     behind: 0,
-    lastCommit: '—',
-    message: '',
+    lastCommit: "—",
+    message: "",
     reviewers: [],
   };
+}
+
+function MarkdownText({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const lines = text.split(/\r?\n/);
+  return (
+    <div className={className}>
+      {lines.map((line, index) => (
+        <React.Fragment key={`${index}:${line}`}>
+          {index > 0 && <br />}
+          {renderMarkdownInline(line)}
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+function renderMarkdownInline(text: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  const pattern = /(\*\*[^*]+\*\*|`[^`]+`)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > lastIndex) out.push(text.slice(lastIndex, match.index));
+    const token = match[0];
+    const key = `${match.index}:${token}`;
+    if (token.startsWith("**")) {
+      out.push(<strong key={key}>{token.slice(2, -2)}</strong>);
+    } else {
+      out.push(<code key={key}>{token.slice(1, -1)}</code>);
+    }
+    lastIndex = match.index + token.length;
+  }
+  if (lastIndex < text.length) out.push(text.slice(lastIndex));
+  return out;
 }
 
 // === Search panel ===
 interface SearchPanelProps {
   codemap: CodemapData;
-  regions: CodemapData['regions'];
+  regions: CodemapData["regions"];
   query: string;
   setQuery: (q: string) => void;
   assistantState: AssistantState;
@@ -662,8 +853,8 @@ interface SearchPanelProps {
   setActiveFilters: (f: Set<string>) => void;
   statusFilter: BranchStatus | null;
   setStatusFilter: (s: BranchStatus | null) => void;
-  kindFilter: Exclude<EntryKind, 'branch'> | null;
-  setKindFilter: (k: Exclude<EntryKind, 'branch'> | null) => void;
+  kindFilter: Exclude<EntryKind, "branch"> | null;
+  setKindFilter: (k: Exclude<EntryKind, "branch"> | null) => void;
   onUploadClick: () => void;
   onDownload: () => void;
   onHelp: () => void;
@@ -697,19 +888,23 @@ function SearchPanel({
   }));
 
   const STATUSES = [
-    { key: 'open', label: 'Open', color: STATUS_COLOR.open },
-    { key: 'draft', label: 'Draft PR', color: STATUS_COLOR.draft },
-    { key: 'merged', label: 'Merged', color: STATUS_COLOR.merged },
-    { key: 'protected', label: 'Protected', color: STATUS_COLOR.protected },
-    { key: 'release', label: 'Release', color: STATUS_COLOR.release },
-    { key: 'stale', label: 'Stale', color: STATUS_COLOR.stale },
+    { key: "open", label: "Open", color: STATUS_COLOR.open },
+    { key: "draft", label: "Draft PR", color: STATUS_COLOR.draft },
+    { key: "merged", label: "Merged", color: STATUS_COLOR.merged },
+    { key: "protected", label: "Protected", color: STATUS_COLOR.protected },
+    { key: "release", label: "Release", color: STATUS_COLOR.release },
+    { key: "stale", label: "Stale", color: STATUS_COLOR.stale },
   ] satisfies Array<{ key: BranchStatus; label: string; color: string }>;
 
   const KINDS = [
-    { key: 'milestone', label: 'Milestone', color: KIND_COLOR.milestone },
-    { key: 'hotpatch', label: 'Hotpatch', color: KIND_COLOR.hotpatch },
-    { key: 'suggested', label: 'Suggested', color: KIND_COLOR.suggested },
-  ] satisfies Array<{ key: Exclude<EntryKind, 'branch'>; label: string; color: string }>;
+    { key: "milestone", label: "Milestone", color: KIND_COLOR.milestone },
+    { key: "hotpatch", label: "Hotpatch", color: KIND_COLOR.hotpatch },
+    { key: "suggested", label: "Suggested", color: KIND_COLOR.suggested },
+  ] satisfies Array<{
+    key: Exclude<EntryKind, "branch">;
+    label: string;
+    color: string;
+  }>;
 
   function toggleFilter(key: string) {
     const next = new Set(activeFilters);
@@ -718,8 +913,13 @@ function SearchPanel({
     setActiveFilters(next);
   }
 
-  const hasAssistantResult = assistantState.status !== 'idle';
-  const hasFilters = activeFilters.size > 0 || statusFilter || kindFilter || query.length > 0 || hasAssistantResult;
+  const hasAssistantResult = assistantState.status !== "idle";
+  const hasFilters =
+    activeFilters.size > 0 ||
+    statusFilter ||
+    kindFilter ||
+    query.length > 0 ||
+    hasAssistantResult;
 
   const suggestions = useMemo(() => {
     const arr = [...matchingBranches];
@@ -735,8 +935,14 @@ function SearchPanel({
         merged: 7,
         stale: 8,
       };
-      const oa = order[entryKind(a) === 'branch' ? entryStatus(a) || 'branch' : entryKind(a)] ?? 9;
-      const ob = order[entryKind(b) === 'branch' ? entryStatus(b) || 'branch' : entryKind(b)] ?? 9;
+      const oa =
+        order[
+          entryKind(a) === "branch" ? entryStatus(a) || "branch" : entryKind(a)
+        ] ?? 9;
+      const ob =
+        order[
+          entryKind(b) === "branch" ? entryStatus(b) || "branch" : entryKind(b)
+        ] ?? 9;
       if (oa !== ob) return oa - ob;
       return 0;
     });
@@ -748,28 +954,72 @@ function SearchPanel({
       <div className="cm-repo-bar">
         <span className="cm-repo-icon" aria-hidden>
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M2 1.5h6.5a1 1 0 0 1 1 1V10a.5.5 0 0 1-.5.5H3a1 1 0 0 1-1-1V1.5z" stroke="currentColor" strokeWidth="1.2"/>
-            <path d="M2 8.5h7.5" stroke="currentColor" strokeWidth="1.2"/>
-            <path d="M4 4h3" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+            <path
+              d="M2 1.5h6.5a1 1 0 0 1 1 1V10a.5.5 0 0 1-.5.5H3a1 1 0 0 1-1-1V1.5z"
+              stroke="currentColor"
+              strokeWidth="1.2"
+            />
+            <path d="M2 8.5h7.5" stroke="currentColor" strokeWidth="1.2" />
+            <path
+              d="M4 4h3"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+            />
           </svg>
         </span>
-        <span className="cm-repo-name">{codemap.name || 'codemap'}</span>
+        <span className="cm-repo-name">{codemap.name || "codemap"}</span>
         <span className="cm-repo-meta">{totalBranches} branches</span>
         <div className="cm-repo-actions">
-          <button className="cm-icon-btn" onClick={onUploadClick} title="Upload .json codemap">
+          <button
+            className="cm-icon-btn"
+            onClick={onUploadClick}
+            title="Upload .json codemap"
+          >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M6.5 8.5V1.5M3.5 4.5l3-3 3 3M2 10.5h9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M6.5 8.5V1.5M3.5 4.5l3-3 3 3M2 10.5h9"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
-          <button className="cm-icon-btn" onClick={onDownload} title="Download current codemap">
+          <button
+            className="cm-icon-btn"
+            onClick={onDownload}
+            title="Download current codemap"
+          >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <path d="M6.5 1.5v7M3.5 5.5l3 3 3-3M2 11.5h9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M6.5 1.5v7M3.5 5.5l3 3 3-3M2 11.5h9"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </button>
-          <button className="cm-icon-btn" onClick={onHelp} title="Schema reference">
+          <button
+            className="cm-icon-btn"
+            onClick={onHelp}
+            title="Schema reference"
+          >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-              <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.2"/>
-              <path d="M4.8 5c0-.9.8-1.5 1.7-1.5s1.7.6 1.7 1.4c0 .7-.6 1.1-1.2 1.4-.5.2-.5.5-.5.8M6.5 9.2v.1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+              <circle
+                cx="6.5"
+                cy="6.5"
+                r="5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <path
+                d="M4.8 5c0-.9.8-1.5 1.7-1.5s1.7.6 1.7 1.4c0 .7-.6 1.1-1.2 1.4-.5.2-.5.5-.5.8M6.5 9.2v.1"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>
@@ -779,18 +1029,29 @@ function SearchPanel({
         <div className="cm-search-row">
           <span className="cm-search-icon" aria-hidden>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <circle cx="6" cy="6" r="4.25" stroke="currentColor" strokeWidth="1.4"/>
-              <path d="M9.4 9.4l3.1 3.1" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+              <circle
+                cx="6"
+                cy="6"
+                r="4.25"
+                stroke="currentColor"
+                strokeWidth="1.4"
+              />
+              <path
+                d="M9.4 9.4l3.1 3.1"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
             </svg>
           </span>
           <input
             id="codemap-search"
             className="cm-search-input"
-            placeholder="Search branches, authors, PRs…"
+            placeholder="Search Branches or Ask Claude"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter' && query.trim()) {
+              if (e.key === "Enter" && query.trim()) {
                 e.preventDefault();
                 onSubmitQuery();
               }
@@ -807,7 +1068,9 @@ function SearchPanel({
           {regionFilters.map((f) => (
             <button
               key={f.key}
-              className={'cm-chip' + (activeFilters.has(f.key) ? ' is-active' : '')}
+              className={
+                "cm-chip" + (activeFilters.has(f.key) ? " is-active" : "")
+              }
               onClick={() => toggleFilter(f.key)}
             >
               {f.label}
@@ -819,8 +1082,12 @@ function SearchPanel({
           {STATUSES.map((s) => (
             <button
               key={s.key}
-              className={'cm-status-chip' + (statusFilter === s.key ? ' is-active' : '')}
-              onClick={() => setStatusFilter(statusFilter === s.key ? null : s.key)}
+              className={
+                "cm-status-chip" + (statusFilter === s.key ? " is-active" : "")
+              }
+              onClick={() =>
+                setStatusFilter(statusFilter === s.key ? null : s.key)
+              }
             >
               <span className="cm-status-dot" style={{ background: s.color }} />
               {s.label}
@@ -829,7 +1096,9 @@ function SearchPanel({
           {KINDS.map((k) => (
             <button
               key={k.key}
-              className={'cm-status-chip' + (kindFilter === k.key ? ' is-active' : '')}
+              className={
+                "cm-status-chip" + (kindFilter === k.key ? " is-active" : "")
+              }
               onClick={() => setKindFilter(kindFilter === k.key ? null : k.key)}
             >
               <span className="cm-status-dot" style={{ background: k.color }} />
@@ -846,48 +1115,19 @@ function SearchPanel({
               {query
                 ? `Matches for "${query}"`
                 : activeFilters.size || statusFilter || kindFilter
-                ? 'Filtered'
-                : 'Recent activity'}
+                  ? "Filtered"
+                  : "Recent activity"}
             </span>
             <span className="cm-suggest-count">
               {matchingBranches.length} / {totalBranches}
             </span>
           </div>
           <div className="cm-suggest-list">
-            {assistantState.status === 'loading' && (
-              <div className="cm-assistant-row cm-assistant-row--pending">
-                <span className="cm-assistant-dot" />
-                <span className="cm-assistant-text">Asking Claude about "{assistantState.command}"...</span>
-              </div>
-            )}
-            {assistantState.status === 'error' && (
-              <div className="cm-assistant-row cm-assistant-row--error">
-                <span className="cm-assistant-dot" />
-                <span className="cm-assistant-text">{assistantState.error}</span>
-              </div>
-            )}
-            {assistantState.status === 'result' && (
-              assistantState.result.action === 'link_existing' || assistantState.result.action === 'create_suggested' ? (
-                <button
-                  className="cm-assistant-row cm-assistant-row--button"
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    onPickBranch(assistantState.result.targetName);
-                  }}
-                >
-                  <span className="cm-assistant-dot" />
-                  <span className="cm-assistant-text">{assistantState.result.message}</span>
-                  <span className="cm-assistant-target">{shortLabel(assistantState.result.targetName)}</span>
-                </button>
-              ) : (
-                <div className="cm-assistant-row">
-                  <span className="cm-assistant-dot" />
-                  <span className="cm-assistant-text">{assistantState.result.message}</span>
-                </div>
-              )
-            )}
             {suggestions.length === 0 && (
-              <div className="cm-suggest-empty">No branches match. Try a different query.</div>
+              <div className="cm-suggest-empty">
+                No matching branches found by name. Try a different query or hit
+                Enter to ask Claude.
+              </div>
             )}
             {suggestions.map((b) => (
               <button
@@ -909,6 +1149,58 @@ function SearchPanel({
                 </span>
               </button>
             ))}
+            {assistantState.status === "loading" && (
+              <div className="cm-assistant-row cm-assistant-row--pending">
+                <span className="cm-assistant-dot" />
+                <span className="cm-assistant-text">
+                  Asking Claude about "{assistantState.command}"...
+                </span>
+              </div>
+            )}
+            {assistantState.status === "error" && (
+              <div className="cm-assistant-row cm-assistant-row--error">
+                <span className="cm-assistant-dot" />
+                <span className="cm-assistant-text">
+                  {assistantState.error}
+                </span>
+              </div>
+            )}
+            {assistantState.status === "result" &&
+              (assistantState.result.action === "link_existing" ||
+              assistantState.result.action === "create_suggested" ? (
+                <div className="cm-assistant-row">
+                  <span className="cm-assistant-dot" />
+                  <div className="cm-assistant-body">
+                    <MarkdownText
+                      className="cm-assistant-text"
+                      text={assistantState.result.message}
+                    />
+                    <div className="cm-assistant-targets">
+                      {assistantState.result.targetNames.map((name) => (
+                        <button
+                          key={name}
+                          className="cm-assistant-target"
+                          title={name}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            onPickBranch(name);
+                          }}
+                        >
+                          {shortLabel(name)}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="cm-assistant-row">
+                  <span className="cm-assistant-dot" />
+                  <MarkdownText
+                    className="cm-assistant-text"
+                    text={assistantState.result.message}
+                  />
+                </div>
+              ))}
           </div>
           <div className="cm-suggest-footer">
             <kbd className="cm-kbd cm-kbd--sm">↵</kbd>
@@ -949,21 +1241,20 @@ function BranchPopup({
 }: BranchPopupProps) {
   const kind = entryKind(branch);
   const status = entryStatus(branch);
-  const isRealBranch = kind === 'branch';
-  const isSuggested = kind === 'suggested';
+  const isRealBranch = kind === "branch";
+  const isSuggested = kind === "suggested";
   const markerColor = entryDisplayColor(branch);
   const related = useMemo(
     () =>
-      branches.filter((b) => b.name !== branch.name && b.region === branch.region).slice(0, 4),
-    [branch, branches]
+      branches
+        .filter((b) => b.name !== branch.name && b.region === branch.region)
+        .slice(0, 4),
+    [branch, branches],
   );
 
   return (
     <div className="cm-popup">
-      <div
-        className="cm-popup-header"
-        style={{ borderLeftColor: markerColor }}
-      >
+      <div className="cm-popup-header" style={{ borderLeftColor: markerColor }}>
         <div className="cm-popup-region">{regionLabel}</div>
         <h2 className="cm-popup-name" title={branch.name}>
           {branch.name}
@@ -978,7 +1269,10 @@ function BranchPopup({
           <div className="cm-stat">
             <span className="cm-stat-label">Kind</span>
             <span className="cm-stat-value">
-              <span className="cm-status-dot" style={{ background: markerColor }} />
+              <span
+                className="cm-status-dot"
+                style={{ background: markerColor }}
+              />
               {entryDisplayLabel(branch)}
             </span>
           </div>
@@ -987,7 +1281,10 @@ function BranchPopup({
           <div className="cm-stat">
             <span className="cm-stat-label">Status</span>
             <span className="cm-stat-value">
-              <span className="cm-status-dot" style={{ background: markerColor }} />
+              <span
+                className="cm-status-dot"
+                style={{ background: markerColor }}
+              />
               {capitalize(status)}
             </span>
           </div>
@@ -1017,7 +1314,9 @@ function BranchPopup({
 
       <div className="cm-popup-commit">
         <div className="cm-popup-section-label">
-          {isRealBranch ? `Latest commit · ${branch.lastCommit || '—'}` : 'Summary'}
+          {isRealBranch
+            ? `Latest commit · ${branch.lastCommit || "—"}`
+            : "Summary"}
         </div>
         <div className="cm-popup-message">{branch.message}</div>
       </div>
@@ -1029,9 +1328,9 @@ function BranchPopup({
             {branch.reviewers.map((r) => (
               <span key={r} className="cm-avatar" title={r}>
                 {r
-                  .split('.')
+                  .split(".")
                   .map((p) => p[0])
-                  .join('')
+                  .join("")
                   .toUpperCase()}
               </span>
             ))}
@@ -1043,7 +1342,11 @@ function BranchPopup({
         <div className="cm-popup-related">
           <div className="cm-popup-section-label">Nearby in {regionLabel}</div>
           {related.map((r) => (
-            <button key={r.name} className="cm-related-row" onClick={() => onJumpRelated(r.name)}>
+            <button
+              key={r.name}
+              className="cm-related-row"
+              onClick={() => onJumpRelated(r.name)}
+            >
               <span
                 className="cm-status-dot"
                 style={{ background: entryDisplayColor(r) }}
@@ -1057,21 +1360,27 @@ function BranchPopup({
 
       {isRealBranch && (
         <div className="cm-popup-actions">
-          <button className="cm-action cm-action--primary" onClick={onCopyCheckout}>
+          <button
+            className="cm-action cm-action--primary"
+            onClick={onCopyCheckout}
+          >
             <span className="cm-action-icon">⎘</span>
             <span>Copy checkout</span>
           </button>
           {pullRequestUrl && (
             <button className="cm-action" onClick={onOpenPullRequest}>
               <span className="cm-action-icon">↗</span>
-              <span>{branch.pr ? 'Open PR' : 'Create PR'}</span>
+              <span>{branch.pr ? "Open PR" : "Create PR"}</span>
             </button>
           )}
         </div>
       )}
       {isSuggested && (
         <div className="cm-popup-actions">
-          <button className="cm-action cm-action--primary" onClick={onCopyClaudeCode}>
+          <button
+            className="cm-action cm-action--primary"
+            onClick={onCopyClaudeCode}
+          >
             <span className="cm-action-icon">⎘</span>
             <span>Copy to Claude Code</span>
           </button>
@@ -1094,9 +1403,9 @@ function DivergenceBar({ ahead, behind }: { ahead: number; behind: number }) {
 }
 
 function checkoutCommandForBranch(branchName: string): string {
-  const remotePrefix = 'remotes/origin/';
+  const remotePrefix = "remotes/origin/";
   if (branchName.startsWith(remotePrefix)) {
-    return `git checkout --track ${shellArg('origin/' + branchName.slice(remotePrefix.length))}`;
+    return `git checkout --track ${shellArg("origin/" + branchName.slice(remotePrefix.length))}`;
   }
   return `git checkout ${shellArg(branchName)}`;
 }
@@ -1105,33 +1414,39 @@ function claudeCodePromptForSuggestedBranch(branch: Branch): string {
   const summary = branch.message || branch.name;
   return [
     `Create a new branch called \`${branch.name}\` for this repository.`,
-    '',
-    'Then use plan mode to come up with an implementation plan for this suggested work:',
-    '',
+    "",
+    "Then use plan mode to come up with an implementation plan for this suggested work:",
+    "",
     summary,
-  ].join('\n');
+  ].join("\n");
 }
 
 function pullRequestUrl(codemap: CodemapData, branch: Branch): string | null {
-  if (entryKind(branch) !== 'branch') return null;
-  const repoUrl = githubRepoUrl(codemap.repo?.webUrl || codemap.repo?.remoteUrl || null);
+  if (entryKind(branch) !== "branch") return null;
+  const repoUrl = githubRepoUrl(
+    codemap.repo?.webUrl || codemap.repo?.remoteUrl || null,
+  );
   if (!repoUrl) return null;
 
   const prNumber = parsePullRequestNumber(branch.pr);
   if (prNumber) return `${repoUrl}/pull/${prNumber}`;
 
-  const base = codemap.repo?.defaultBranch || 'main';
-  const head = branch.name.startsWith('remotes/origin/')
-    ? branch.name.slice('remotes/origin/'.length)
+  const base = codemap.repo?.defaultBranch || "main";
+  const head = branch.name.startsWith("remotes/origin/")
+    ? branch.name.slice("remotes/origin/".length)
     : branch.name;
-  if (!head || head === base || entryStatus(branch) === 'protected') return null;
+  if (!head || head === base || entryStatus(branch) === "protected")
+    return null;
 
   return `${repoUrl}/compare/${encodeURIComponent(base)}...${encodeURIComponent(head)}?expand=1`;
 }
 
 function githubRepoUrl(remote: string | null): string | null {
   if (!remote) return null;
-  const clean = remote.trim().replace(/\/$/, '').replace(/\.git$/, '');
+  const clean = remote
+    .trim()
+    .replace(/\/$/, "")
+    .replace(/\.git$/, "");
   const https = clean.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)$/);
   if (https) return `https://github.com/${https[1]}/${https[2]}`;
 
@@ -1151,7 +1466,9 @@ function parsePullRequestNumber(pr: string | null | undefined): string | null {
 }
 
 function shellArg(value: string): string {
-  return /^[A-Za-z0-9._/@:-]+$/.test(value) ? value : `'${value.replace(/'/g, `'\\''`)}'`;
+  return /^[A-Za-z0-9._/@:-]+$/.test(value)
+    ? value
+    : `'${value.replace(/'/g, `'\\''`)}'`;
 }
 
 async function copyText(text: string): Promise<void> {
@@ -1164,16 +1481,16 @@ async function copyText(text: string): Promise<void> {
     }
   }
 
-  const textarea = document.createElement('textarea');
+  const textarea = document.createElement("textarea");
   textarea.value = text;
-  textarea.setAttribute('readonly', '');
-  textarea.style.position = 'fixed';
-  textarea.style.left = '-9999px';
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.left = "-9999px";
   document.body.appendChild(textarea);
   textarea.select();
-  const copied = document.execCommand('copy');
+  const copied = document.execCommand("copy");
   document.body.removeChild(textarea);
-  if (!copied) throw new Error('Copy failed');
+  if (!copied) throw new Error("Copy failed");
 }
 
 function ZoomControls({
@@ -1187,10 +1504,19 @@ function ZoomControls({
 }) {
   return (
     <div className="cm-zoom">
-      <button className="cm-zoom-btn" onClick={onRecenter} title="Recenter on main">
+      <button
+        className="cm-zoom-btn"
+        onClick={onRecenter}
+        title="Recenter on main"
+      >
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <circle cx="7" cy="7" r="2" fill="currentColor"/>
-          <path d="M7 1v2M7 11v2M1 7h2M11 7h2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+          <circle cx="7" cy="7" r="2" fill="currentColor" />
+          <path
+            d="M7 1v2M7 11v2M1 7h2M11 7h2"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
         </svg>
       </button>
       <div className="cm-zoom-divider" />
@@ -1242,12 +1568,14 @@ function StatusBar({
       <span className="cm-status-sep">·</span>
       <span className="cm-status-section">
         <span className="cm-status-key">branches</span>
-        <span className="cm-mono">{hasFilters ? `${matchCount}/${totalCount}` : totalCount}</span>
+        <span className="cm-mono">
+          {hasFilters ? `${matchCount}/${totalCount}` : totalCount}
+        </span>
       </span>
       <span className="cm-status-sep">·</span>
       <span className="cm-status-section">
         <span className="cm-status-key">tile</span>
-        <span className="cm-mono">{hovered ? hovered.name : '—'}</span>
+        <span className="cm-mono">{hovered ? hovered.name : "—"}</span>
       </span>
     </div>
   );
@@ -1260,9 +1588,11 @@ function HelpOverlay({
   onClose: () => void;
   onLoadSample: (path: string) => void;
 }) {
-  const [samples, setSamples] = useState<Array<{ path: string; name: string; branches: number }>>([]);
+  const [samples, setSamples] = useState<
+    Array<{ path: string; name: string; branches: number }>
+  >([]);
   useEffect(() => {
-    fetch('/api/samples')
+    fetch("/api/samples")
       .then((r) => r.json())
       .then(setSamples)
       .catch(() => {});
@@ -1278,14 +1608,18 @@ function HelpOverlay({
         </div>
         <div className="cm-help-body">
           <p>
-            Upload a <code>.json</code> file with this shape. Drop it anywhere on the page, or use
-            the ↑ icon in the top bar.
+            Upload a <code>.json</code> file with this shape. Drop it anywhere
+            on the page, or use the ↑ icon in the top bar.
           </p>
 
           <div className="cm-help-section-title">Try a sample</div>
           <div className="cm-help-samples">
             {samples.map((s) => (
-              <button key={s.path} className="cm-sample-btn" onClick={() => onLoadSample(s.path)}>
+              <button
+                key={s.path}
+                className="cm-sample-btn"
+                onClick={() => onLoadSample(s.path)}
+              >
                 <span className="cm-sample-name">{s.name}</span>
                 <span className="cm-sample-meta">
                   {s.branches} branches · {s.path}
@@ -1334,13 +1668,15 @@ function HelpOverlay({
           <div className="cm-help-grid">
             <div>
               <div className="cm-help-label">Biomes</div>
-              <code>plains · forest · mountain · water · swamp · desert · volcanic</code>
+              <code>
+                plains · forest · mountain · water · swamp · desert · volcanic
+              </code>
             </div>
             <div>
               <div className="cm-help-label">Icons</div>
               <code>
-                castle · fortress · tower · keep · house · hut · tent · pickaxe · rock · fort ·
-                ship · volcano · ruin · obelisk
+                castle · fortress · tower · keep · house · hut · tent · pickaxe
+                · rock · fort · ship · volcano · ruin · obelisk
               </code>
             </div>
             <div>
@@ -1354,8 +1690,8 @@ function HelpOverlay({
             <div>
               <div className="cm-help-label">Region center</div>
               <code>
-                [x, y] origin-centered — main at [0,0]. Branches cluster around this
-                point. Typical range [-5, 5]. Expand outward for new areas.
+                [x, y] origin-centered — main at [0,0]. Branches cluster around
+                this point. Typical range [-5, 5]. Expand outward for new areas.
               </code>
             </div>
           </div>
@@ -1370,7 +1706,7 @@ function capitalize(s: string): string {
 }
 
 function shortLabel(name: string): string {
-  const idx = name.indexOf('/');
+  const idx = name.indexOf("/");
   if (idx < 0) return name;
   return name.slice(idx + 1);
 }

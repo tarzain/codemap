@@ -172,11 +172,9 @@ button { font-family: inherit; }
   color: var(--ink);
   text-align: left;
 }
-.cm-assistant-row--button {
-  cursor: pointer;
-}
-.cm-assistant-row--button:hover {
-  background: rgba(58, 130, 196, 0.14);
+.cm-suggest-row + .cm-assistant-row,
+.cm-suggest-empty + .cm-assistant-row {
+  margin-top: 8px;
 }
 .cm-assistant-row--pending {
   color: var(--ink-2);
@@ -195,14 +193,37 @@ button { font-family: inherit; }
 .cm-assistant-row--error .cm-assistant-dot {
   background: #b8442a;
 }
+.cm-assistant-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
 .cm-assistant-text {
   flex: 1;
   min-width: 0;
   font-size: 12px;
   line-height: 1.35;
 }
+.cm-assistant-text strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+.cm-assistant-text code {
+  font: 11px/1.2 var(--mono);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 4px;
+  padding: 1px 4px;
+}
+.cm-assistant-targets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
 .cm-assistant-target {
-  max-width: 120px;
+  max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -212,6 +233,11 @@ button { font-family: inherit; }
   background: var(--panel);
   border-radius: 6px;
   padding: 3px 6px;
+  cursor: pointer;
+}
+.cm-assistant-target:hover {
+  border-color: var(--ink-3);
+  background: var(--panel-2);
 }
 .cm-suggest-empty {
   padding: 16px 14px;

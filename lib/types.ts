@@ -64,6 +64,7 @@ export interface CodemapAssistantResult {
   action: "link_existing" | "create_suggested" | "answer";
   message: string;
   targetName: string;
+  targetNames: string[];
   suggestedBranch: SuggestedBranchPayload;
 }
 

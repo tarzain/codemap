@@ -3,6 +3,7 @@ import type { CodemapAssistantResult, CodemapData, SuggestedBranchPayload } from
 
 const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 const DEFAULT_MODEL = "claude-sonnet-4-6";
+const MAX_TARGETS = 8;
 
 const EMPTY_SUGGESTED_BRANCH: SuggestedBranchPayload = {
   name: "",
@@ -24,6 +25,10 @@ const ASSISTANT_SCHEMA = {
     action: { type: "string", enum: ["link_existing", "create_suggested", "answer"] },
     message: { type: "string" },
     targetName: { type: "string" },
+    targetNames: {
+      type: "array",
+      items: { type: "string" },
+    },
     suggestedBranch: {
       type: "object",
       properties: {
@@ -61,7 +66,7 @@ const ASSISTANT_SCHEMA = {
       additionalProperties: false,
     },
   },
-  required: ["action", "message", "targetName", "suggestedBranch"],
+  required: ["action", "message", "targetName", "targetNames", "suggestedBranch"],
   additionalProperties: false,
 };
 
@@ -165,9 +170,11 @@ function systemPrompt(codemap: CodemapData): string {
     `Use only these existing region IDs for new suggestions: ${regionIds}.`,
     "Place new suggestions near related existing entries. Avoid duplicate names and exact duplicate positions.",
     "Return concise UI-facing text in message.",
-    "For action=link_existing, set targetName to an exact existing entry name and use an empty suggestedBranch object with default values.",
-    "For action=answer, set targetName to an empty string and use an empty suggestedBranch object with default values.",
-    "For action=create_suggested, fill every suggestedBranch field. Use author and lastCommit as em dash when unknown.",
+    "For action=link_existing, set targetNames to up to 8 exact existing entry names ordered by relevance. Set targetName to the first targetNames item.",
+    "For single obvious matches, return one exact entry in targetNames.",
+    "For open-ended discovery questions, return multiple exact entries in targetNames when several entries are relevant.",
+    "For action=answer, set targetName to an empty string, targetNames to an empty array, and use an empty suggestedBranch object with default values.",
+    "For action=create_suggested, fill every suggestedBranch field, set targetName to the new branch name, and set targetNames to an array containing the new branch name. Use author and lastCommit as em dash when unknown.",
   ].join("\n");
 }
 
@@ -180,13 +187,21 @@ function normalizeResult(raw: unknown, codemap: CodemapData): CodemapAssistantRe
     : "Claude returned a result.";
 
   if (result.action === "link_existing") {
-    if (entries.has(result.targetName)) {
-      return { ...result, message, suggestedBranch: EMPTY_SUGGESTED_BRANCH };
+    const targetNames = validTargetNames(result, entries);
+    if (targetNames.length > 0) {
+      return {
+        ...result,
+        message,
+        targetName: targetNames[0],
+        targetNames,
+        suggestedBranch: EMPTY_SUGGESTED_BRANCH,
+      };
     }
     return {
       action: "answer",
-      message: `Claude referenced "${result.targetName}", but that entry does not exist in this codemap.`,
+      message: "Claude referenced entries that do not exist in this codemap.",
       targetName: "",
+      targetNames: [],
       suggestedBranch: EMPTY_SUGGESTED_BRANCH,
     };
   }
@@ -199,6 +214,7 @@ function normalizeResult(raw: unknown, codemap: CodemapData): CodemapAssistantRe
         action: "link_existing",
         message,
         targetName: branch.name,
+        targetNames: [branch.name],
         suggestedBranch: EMPTY_SUGGESTED_BRANCH,
       };
     }
@@ -207,6 +223,7 @@ function normalizeResult(raw: unknown, codemap: CodemapData): CodemapAssistantRe
         action: "answer",
         message: `Claude suggested region "${branch.region}", but that region does not exist in this codemap.`,
         targetName: "",
+        targetNames: [],
         suggestedBranch: EMPTY_SUGGESTED_BRANCH,
       };
     }
@@ -214,6 +231,7 @@ function normalizeResult(raw: unknown, codemap: CodemapData): CodemapAssistantRe
       action: "create_suggested",
       message,
       targetName: branch.name,
+      targetNames: [branch.name],
       suggestedBranch: branch,
     };
   }
@@ -223,11 +241,26 @@ function normalizeResult(raw: unknown, codemap: CodemapData): CodemapAssistantRe
       action: "answer",
       message,
       targetName: "",
+      targetNames: [],
       suggestedBranch: EMPTY_SUGGESTED_BRANCH,
     };
   }
 
   throw new Error(`Unknown action "${String(result.action)}".`);
+}
+
+function validTargetNames(result: CodemapAssistantResult, entries: Set<string>): string[] {
+  const names = Array.isArray(result.targetNames) ? result.targetNames : [];
+  const allNames = [...names, result.targetName].filter((name) => typeof name === "string");
+  const seen = new Set<string>();
+  const valid: string[] = [];
+  for (const name of allNames) {
+    if (!entries.has(name) || seen.has(name)) continue;
+    seen.add(name);
+    valid.push(name);
+    if (valid.length >= MAX_TARGETS) break;
+  }
+  return valid;
 }
 
 function normalizeSuggestedBranch(branch: SuggestedBranchPayload): SuggestedBranchPayload {
