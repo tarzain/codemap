@@ -46,6 +46,27 @@ export interface Branch {
   reviewers?: string[];
 }
 
+export interface SuggestedBranchPayload {
+  name: string;
+  region: string;
+  position: [number, number];
+  icon: string;
+  author: string;
+  commits: number;
+  ahead: number;
+  behind: number;
+  lastCommit: string;
+  message: string;
+  reviewers: string[];
+}
+
+export interface CodemapAssistantResult {
+  action: "link_existing" | "create_suggested" | "answer";
+  message: string;
+  targetName: string;
+  suggestedBranch: SuggestedBranchPayload;
+}
+
 export function entryKind(branch: Branch): EntryKind {
   return branch.kind;
 }

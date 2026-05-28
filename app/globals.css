@@ -159,6 +159,60 @@ button { font-family: inherit; }
   flex-shrink: 0;
 }
 .cm-suggest-author { font-family: var(--mono); }
+.cm-assistant-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  margin-bottom: 4px;
+  border: 1px solid rgba(58, 130, 196, 0.18);
+  border-radius: 8px;
+  background: rgba(58, 130, 196, 0.08);
+  color: var(--ink);
+  text-align: left;
+}
+.cm-assistant-row--button {
+  cursor: pointer;
+}
+.cm-assistant-row--button:hover {
+  background: rgba(58, 130, 196, 0.14);
+}
+.cm-assistant-row--pending {
+  color: var(--ink-2);
+}
+.cm-assistant-row--error {
+  border-color: rgba(184, 68, 42, 0.22);
+  background: rgba(184, 68, 42, 0.08);
+}
+.cm-assistant-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3a82c4;
+  flex-shrink: 0;
+}
+.cm-assistant-row--error .cm-assistant-dot {
+  background: #b8442a;
+}
+.cm-assistant-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+.cm-assistant-target {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 11px/1.2 var(--mono);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 6px;
+  padding: 3px 6px;
+}
 .cm-suggest-empty {
   padding: 16px 14px;
   color: var(--ink-3);

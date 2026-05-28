@@ -8,9 +8,11 @@ import {
   entryKind,
   entryStatus,
   type BranchStatus,
+  type CodemapAssistantResult,
   type CodemapData,
   type Branch,
   type EntryKind,
+  type SuggestedBranchPayload,
   type World,
 } from '@/lib/types';
 
@@ -28,6 +30,12 @@ const KIND_COLOR: Record<Exclude<EntryKind, 'branch'>, string> = {
   milestone: '#9a5ac4',
   hotpatch: '#d4583a',
 };
+
+type AssistantState =
+  | { status: 'idle' }
+  | { status: 'loading'; command: string }
+  | { status: 'result'; command: string; result: CodemapAssistantResult }
+  | { status: 'error'; command: string; error: string };
 
 const FALLBACK_CODEMAP: CodemapData = {
   $schema: 'codemap@1',
@@ -60,6 +68,8 @@ export default function CodemapApp() {
   const [t, setTweak] = useTweaks({ seed: null as number | null, showLabels: true });
 
   const [codemap, setCodemap] = useState<CodemapData | null>(null);
+  const [transientBranches, setTransientBranches] = useState<Branch[]>([]);
+  const [assistantState, setAssistantState] = useState<AssistantState>({ status: 'idle' });
   const [loadError, setLoadError] = useState<string | null>(null);
   const [importMessage, setImportMessage] = useState<{ type: string; text: string } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -81,11 +91,20 @@ export default function CodemapApp() {
       });
   }, []);
 
-  const effectiveSeed = ((t.seed ?? codemap?.seed ?? 1337) | 0) as number;
-  const world = useMemo<World | null>(() => {
+  const effectiveCodemap = useMemo<CodemapData | null>(() => {
     if (!codemap) return null;
-    return generateWorld({ ...codemap, seed: effectiveSeed });
-  }, [codemap, effectiveSeed]);
+    if (transientBranches.length === 0) return codemap;
+    return {
+      ...codemap,
+      branches: [...codemap.branches, ...transientBranches],
+    };
+  }, [codemap, transientBranches]);
+
+  const effectiveSeed = ((t.seed ?? effectiveCodemap?.seed ?? 1337) | 0) as number;
+  const world = useMemo<World | null>(() => {
+    if (!effectiveCodemap) return null;
+    return generateWorld({ ...effectiveCodemap, seed: effectiveSeed });
+  }, [effectiveCodemap, effectiveSeed]);
 
   const [selected, setSelected] = useState<string | null>(null);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -99,9 +118,9 @@ export default function CodemapApp() {
   const rootRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const currentCheckout = codemap?.head;
-  const branches = codemap?.branches || [];
-  const regions = codemap?.regions || {};
+  const currentCheckout = effectiveCodemap?.head;
+  const branches = effectiveCodemap?.branches || [];
+  const regions = effectiveCodemap?.regions || {};
 
   useEffect(() => {
     function onResize() {
@@ -121,6 +140,8 @@ export default function CodemapApp() {
     setActiveFilters(new Set());
     setStatusFilter(null);
     setKindFilter(null);
+    setTransientBranches([]);
+    setAssistantState({ status: 'idle' });
   }, [codemap]);
 
   const dimmedSet = useMemo(() => {
@@ -159,6 +180,11 @@ export default function CodemapApp() {
   const handleSelect = (name: string | null) => {
     setSelected(name);
     if (name) setFocusBranch({ name, ts: Date.now() });
+  };
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    if (assistantState.status !== 'idle') setAssistantState({ status: 'idle' });
   };
 
   // Drag-and-drop JSON
@@ -262,6 +288,16 @@ export default function CodemapApp() {
     }
   }
 
+  async function copyClaudeCodePrompt(branch: Branch) {
+    const prompt = claudeCodePromptForSuggestedBranch(branch);
+    try {
+      await copyText(prompt);
+      showToast('success', 'Copied Claude Code prompt.');
+    } catch {
+      showToast('error', 'Could not copy Claude Code prompt.');
+    }
+  }
+
   function openPullRequest(branch: Branch) {
     if (!codemap) return;
     const url = pullRequestUrl(codemap, branch);
@@ -270,6 +306,57 @@ export default function CodemapApp() {
       return;
     }
     window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
+  async function submitAssistantQuery() {
+    const command = query.trim();
+    if (!command || !effectiveCodemap || assistantState.status === 'loading') return;
+
+    setAssistantState({ status: 'loading', command });
+    try {
+      const response = await fetch('/api/codemap/query', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ command, codemap: effectiveCodemap }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || 'Claude request failed.');
+
+      const result = normalizeAssistantResult(payload as CodemapAssistantResult, branches, regions);
+      if (result.action === 'link_existing') {
+        setAssistantState({ status: 'result', command, result });
+        return;
+      }
+
+      if (result.action === 'create_suggested') {
+        const existing = branches.find((branch) => branch.name === result.targetName);
+        if (existing) {
+          const linkResult: CodemapAssistantResult = {
+            action: 'link_existing',
+            message: result.message,
+            targetName: existing.name,
+            suggestedBranch: emptySuggestedBranch(),
+          };
+          setAssistantState({ status: 'result', command, result: linkResult });
+          handleSelect(existing.name);
+          return;
+        }
+
+        const branch = suggestedPayloadToBranch(result.suggestedBranch);
+        setTransientBranches((prev) => [...prev, branch]);
+        setAssistantState({ status: 'result', command, result });
+        handleSelect(branch.name);
+        return;
+      }
+
+      setAssistantState({ status: 'result', command, result });
+    } catch (error) {
+      setAssistantState({
+        status: 'error',
+        command,
+        error: (error as Error).message || 'Claude request failed.',
+      });
+    }
   }
 
   useEffect(() => {
@@ -321,10 +408,12 @@ export default function CodemapApp() {
       />
 
       <SearchPanel
-        codemap={codemap}
+        codemap={effectiveCodemap || codemap}
         regions={regions}
         query={query}
-        setQuery={setQuery}
+        setQuery={handleQueryChange}
+        assistantState={assistantState}
+        onSubmitQuery={submitAssistantQuery}
         focused={searchFocused}
         setFocused={setSearchFocused}
         matchingBranches={matchingBranches}
@@ -350,6 +439,7 @@ export default function CodemapApp() {
           onClose={() => setSelected(null)}
           onJumpRelated={(name) => handleSelect(name)}
           onCopyCheckout={() => copyCheckoutCommand(selectedBranchObj)}
+          onCopyClaudeCode={() => copyClaudeCodePrompt(selectedBranchObj)}
           onOpenPullRequest={() => openPullRequest(selectedBranchObj)}
         />
       )}
@@ -467,12 +557,102 @@ function entryDisplayLabel(branch: Branch): string {
   return status ? capitalize(status) : 'Branch';
 }
 
+function normalizeAssistantResult(
+  result: CodemapAssistantResult,
+  branches: Branch[],
+  regions: CodemapData['regions']
+): CodemapAssistantResult {
+  if (result.action === 'link_existing') {
+    if (!branches.some((branch) => branch.name === result.targetName)) {
+      return {
+        action: 'answer',
+        message: `Claude referenced "${result.targetName}", but that entry is not on this map.`,
+        targetName: '',
+        suggestedBranch: emptySuggestedBranch(),
+      };
+    }
+    return { ...result, suggestedBranch: emptySuggestedBranch() };
+  }
+
+  if (result.action === 'create_suggested') {
+    const branch = normalizeSuggestedPayload(result.suggestedBranch);
+    if (!branch.name) throw new Error('Claude returned a suggested branch without a name.');
+    if (!regions[branch.region]) {
+      return {
+        action: 'answer',
+        message: `Claude suggested region "${branch.region}", but that region is not on this map.`,
+        targetName: '',
+        suggestedBranch: emptySuggestedBranch(),
+      };
+    }
+    return {
+      action: 'create_suggested',
+      message: result.message || `Created suggested branch "${branch.name}".`,
+      targetName: branch.name,
+      suggestedBranch: branch,
+    };
+  }
+
+  return {
+    action: 'answer',
+    message: result.message || 'Claude returned an answer.',
+    targetName: '',
+    suggestedBranch: emptySuggestedBranch(),
+  };
+}
+
+function normalizeSuggestedPayload(branch: SuggestedBranchPayload): SuggestedBranchPayload {
+  const position = Array.isArray(branch.position) && branch.position.length >= 2
+    ? [Number(branch.position[0]) || 0, Number(branch.position[1]) || 0]
+    : [0, 0];
+
+  return {
+    name: String(branch.name || '').trim(),
+    region: String(branch.region || '').trim(),
+    position: position as [number, number],
+    icon: String(branch.icon || 'tent').trim() || 'tent',
+    author: String(branch.author || '—').trim() || '—',
+    commits: Number.isFinite(branch.commits) ? branch.commits : 0,
+    ahead: Number.isFinite(branch.ahead) ? branch.ahead : 0,
+    behind: Number.isFinite(branch.behind) ? branch.behind : 0,
+    lastCommit: String(branch.lastCommit || '—').trim() || '—',
+    message: String(branch.message || branch.name || '').trim(),
+    reviewers: Array.isArray(branch.reviewers) ? branch.reviewers.map(String) : [],
+  };
+}
+
+function suggestedPayloadToBranch(branch: SuggestedBranchPayload): Branch {
+  return {
+    ...normalizeSuggestedPayload(branch),
+    kind: 'suggested',
+    pr: null,
+  };
+}
+
+function emptySuggestedBranch(): SuggestedBranchPayload {
+  return {
+    name: '',
+    region: '',
+    position: [0, 0],
+    icon: 'tent',
+    author: '—',
+    commits: 0,
+    ahead: 0,
+    behind: 0,
+    lastCommit: '—',
+    message: '',
+    reviewers: [],
+  };
+}
+
 // === Search panel ===
 interface SearchPanelProps {
   codemap: CodemapData;
   regions: CodemapData['regions'];
   query: string;
   setQuery: (q: string) => void;
+  assistantState: AssistantState;
+  onSubmitQuery: () => void;
   focused: boolean;
   setFocused: (f: boolean) => void;
   matchingBranches: Branch[];
@@ -494,6 +674,8 @@ function SearchPanel({
   regions,
   query,
   setQuery,
+  assistantState,
+  onSubmitQuery,
   focused,
   setFocused,
   matchingBranches,
@@ -536,7 +718,8 @@ function SearchPanel({
     setActiveFilters(next);
   }
 
-  const hasFilters = activeFilters.size > 0 || statusFilter || kindFilter || query.length > 0;
+  const hasAssistantResult = assistantState.status !== 'idle';
+  const hasFilters = activeFilters.size > 0 || statusFilter || kindFilter || query.length > 0 || hasAssistantResult;
 
   const suggestions = useMemo(() => {
     const arr = [...matchingBranches];
@@ -606,6 +789,12 @@ function SearchPanel({
             placeholder="Search branches, authors, PRs…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && query.trim()) {
+                e.preventDefault();
+                onSubmitQuery();
+              }
+            }}
             onFocus={() => setFocused(true)}
             onBlur={() => setTimeout(() => setFocused(false), 150)}
             autoComplete="off"
@@ -665,6 +854,38 @@ function SearchPanel({
             </span>
           </div>
           <div className="cm-suggest-list">
+            {assistantState.status === 'loading' && (
+              <div className="cm-assistant-row cm-assistant-row--pending">
+                <span className="cm-assistant-dot" />
+                <span className="cm-assistant-text">Asking Claude about "{assistantState.command}"...</span>
+              </div>
+            )}
+            {assistantState.status === 'error' && (
+              <div className="cm-assistant-row cm-assistant-row--error">
+                <span className="cm-assistant-dot" />
+                <span className="cm-assistant-text">{assistantState.error}</span>
+              </div>
+            )}
+            {assistantState.status === 'result' && (
+              assistantState.result.action === 'link_existing' || assistantState.result.action === 'create_suggested' ? (
+                <button
+                  className="cm-assistant-row cm-assistant-row--button"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    onPickBranch(assistantState.result.targetName);
+                  }}
+                >
+                  <span className="cm-assistant-dot" />
+                  <span className="cm-assistant-text">{assistantState.result.message}</span>
+                  <span className="cm-assistant-target">{shortLabel(assistantState.result.targetName)}</span>
+                </button>
+              ) : (
+                <div className="cm-assistant-row">
+                  <span className="cm-assistant-dot" />
+                  <span className="cm-assistant-text">{assistantState.result.message}</span>
+                </div>
+              )
+            )}
             {suggestions.length === 0 && (
               <div className="cm-suggest-empty">No branches match. Try a different query.</div>
             )}
@@ -691,7 +912,7 @@ function SearchPanel({
           </div>
           <div className="cm-suggest-footer">
             <kbd className="cm-kbd cm-kbd--sm">↵</kbd>
-            <span>jump to branch</span>
+            <span>ask Claude</span>
             <span className="cm-suggest-spacer" />
             <kbd className="cm-kbd cm-kbd--sm">esc</kbd>
             <span>close</span>
@@ -711,6 +932,7 @@ interface BranchPopupProps {
   onClose: () => void;
   onJumpRelated: (name: string) => void;
   onCopyCheckout: () => void;
+  onCopyClaudeCode: () => void;
   onOpenPullRequest: () => void;
 }
 
@@ -722,11 +944,13 @@ function BranchPopup({
   onClose,
   onJumpRelated,
   onCopyCheckout,
+  onCopyClaudeCode,
   onOpenPullRequest,
 }: BranchPopupProps) {
   const kind = entryKind(branch);
   const status = entryStatus(branch);
   const isRealBranch = kind === 'branch';
+  const isSuggested = kind === 'suggested';
   const markerColor = entryDisplayColor(branch);
   const related = useMemo(
     () =>
@@ -845,6 +1069,14 @@ function BranchPopup({
           )}
         </div>
       )}
+      {isSuggested && (
+        <div className="cm-popup-actions">
+          <button className="cm-action cm-action--primary" onClick={onCopyClaudeCode}>
+            <span className="cm-action-icon">⎘</span>
+            <span>Copy to Claude Code</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -867,6 +1099,17 @@ function checkoutCommandForBranch(branchName: string): string {
     return `git checkout --track ${shellArg('origin/' + branchName.slice(remotePrefix.length))}`;
   }
   return `git checkout ${shellArg(branchName)}`;
+}
+
+function claudeCodePromptForSuggestedBranch(branch: Branch): string {
+  const summary = branch.message || branch.name;
+  return [
+    `Create a new branch called \`${branch.name}\` for this repository.`,
+    '',
+    'Then use plan mode to come up with an implementation plan for this suggested work:',
+    '',
+    summary,
+  ].join('\n');
 }
 
 function pullRequestUrl(codemap: CodemapData, branch: Branch): string | null {
