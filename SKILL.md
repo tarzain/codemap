@@ -171,6 +171,22 @@ Write `<project>-codemap.json` to the project root as well, as a sibling to the 
 
 The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes a landmark on a procedurally-generated terrain map. Semantically-related branches should cluster in the same region; the biome signals the nature of the work.
 
+### Updating an existing codemap
+
+Before writing a codemap, check whether `<project>-codemap.json` already exists. If it does, treat the existing file as the stable map geography.
+
+Default update behavior:
+- Preserve existing `position` values for entries whose names still exist.
+- Preserve existing `region`, region labels, and biomes unless the existing assignment is clearly wrong or the user asks for a layout refresh.
+- Update metadata in place: `head`, `repo`, `kind`, `status`, `ahead`, `behind`, `lastCommit`, `message`, `pr`, `reviewers`, and `commits`.
+- Add new real branches near the existing cluster that best matches their touched files, subsystem, or region.
+- Add new suggested work near the existing region it would affect; create a new region only when it represents a genuinely new product/system area.
+- Add new milestone and hotpatch entries near the topical cluster they summarize, slightly closer to main than active work when appropriate.
+- Remove or mark stale entries only when the underlying branch/work no longer exists or the current analysis shows it is obsolete.
+- Keep `seed` stable so terrain noise does not change between updates.
+
+Do not recompute the whole layout just because branch counts, commit counts, or suggested work changed. Moving existing landmarks makes the map harder to read over time. Only move existing entries when positions are invalid, duplicated, grossly misleading, or the user explicitly asks to reorganize the map.
+
 ### Schema
 
 ```jsonc
@@ -372,7 +388,7 @@ This makes the codemap a complete picture of the current state AND the future ro
 
 ### Branch count and coverage
 
-Aim for 40–70 branches total. Include:
+Aim for 40–70 branches minimum. Include:
 - All real local branches
 - All significant remote branches (skip trivial one-commit remote branches)
 - One entry per major refactoring opportunity from the codetree
@@ -394,6 +410,8 @@ Before finishing, verify:
 - [ ] All deletion candidates in §7 have a corresponding `kind: "suggested"` entry in the codemap
 - [ ] §11 history section covers: velocity stats, epoch timeline with state-at-end, direct-to-main table, full PR log
 - [ ] `<project>-codemap.json` written with valid JSON (no trailing commas)
+- [ ] If updating an existing codemap, existing positions and seed are preserved unless a layout refresh was requested
+- [ ] If updating an existing codemap, new entries are placed near related existing clusters rather than triggering a full rearrangement
 - [ ] Every branch's `region` value matches a key in `regions`
 - [ ] Every branch has a valid `kind` value
 - [ ] Every branch has a `position: [x, y]` field (origin-centered, unbounded)
