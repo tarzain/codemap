@@ -43,37 +43,8 @@ type AssistantState =
   | { status: "result"; command: string; result: CodemapAssistantResult }
   | { status: "error"; command: string; error: string };
 
-const FALLBACK_CODEMAP: CodemapData = {
-  $schema: "codemap@1",
-  name: "demo",
-  seed: 1337,
-  head: "main",
-  regions: {
-    capital: {
-      label: "Mainline",
-      biome: "plains",
-      center: [0, 0],
-      spread: 0.5,
-    },
-  },
-  branches: [
-    {
-      name: "main",
-      region: "capital",
-      kind: "branch",
-      icon: "castle",
-      author: "team",
-      commits: 0,
-      status: "protected",
-      ahead: 0,
-      behind: 0,
-      lastCommit: "—",
-      message: "—",
-      pr: null,
-      reviewers: [],
-    },
-  ],
-};
+type SampleSummary = { path: string; name: string; branches: number };
+const DEFAULT_SAMPLE_PATH = "samples/anthropic-sdk-python-codemap.json";
 
 export default function CodemapApp() {
   const [t, setTweak] = useTweaks({
@@ -92,25 +63,29 @@ export default function CodemapApp() {
     text: string;
   } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [chooserOpen, setChooserOpen] = useState(true);
 
   useEffect(() => {
-    fetch("/samples/anthropic-sdk-python-codemap.json")
+    fetch("/" + DEFAULT_SAMPLE_PATH)
       .then((r) => {
         if (!r.ok) throw new Error("HTTP " + r.status);
         return r.json();
       })
-      .then((json) => {
-        setCodemap(json as CodemapData);
+      .then((json: CodemapData) => {
+        const valid = validateCodemap(json);
+        if (!valid.ok) throw new Error(valid.error);
+        setCodemap(json);
+        setTweak("seed", null);
         setLoadError(null);
+        setChooserOpen(true);
       })
-      .catch((err) => {
-        console.warn("Could not load default codemap, using fallback:", err);
-        setCodemap(FALLBACK_CODEMAP);
+      .catch((err: Error) => {
         setLoadError(
-          "Default codemap couldn't load. Using fallback. Upload a JSON to view another codebase.",
+          `Default codemap couldn't load: ${err.message}. Choose a sample or upload a JSON codemap.`,
         );
+        setChooserOpen(true);
       });
-  }, []);
+  }, [setTweak]);
 
   const effectiveCodemap = useMemo<CodemapData | null>(() => {
     if (!codemap) return null;
@@ -260,6 +235,9 @@ export default function CodemapApp() {
         if (valid.ok) {
           setCodemap(json);
           setTweak("seed", null);
+          setHelpOpen(false);
+          setLoadError(null);
+          setChooserOpen(false);
           setImportMessage({
             type: "success",
             text: `Loaded "${json.name || file.name}" — ${json.branches.length} branches.`,
@@ -288,7 +266,9 @@ export default function CodemapApp() {
         if (!valid.ok) throw new Error(valid.error);
         setCodemap(json);
         setTweak("seed", null);
+        setLoadError(null);
         setHelpOpen(false);
+        setChooserOpen(false);
         setImportMessage({
           type: "success",
           text: `Loaded "${json.name}" — ${json.branches.length} branches.`,
@@ -442,18 +422,32 @@ export default function CodemapApp() {
 
   if (!codemap) {
     return (
-      <div ref={rootRef} className="cm-root cm-loading">
-        <div className="cm-spinner" />
-        <div
-          style={{
-            marginTop: 12,
-            color: "#a8a89c",
-            fontFamily: "var(--mono)",
-            fontSize: 12,
+      <div ref={rootRef} className="cm-root">
+        {chooserOpen && (
+          <SampleChooser
+            onLoadSample={loadSample}
+            onUploadClick={() => fileInputRef.current?.click()}
+          />
+        )}
+        {importMessage && (
+          <div className={`cm-toast cm-toast--${importMessage.type}`}>
+            {importMessage.text}
+          </div>
+        )}
+        {loadError && !importMessage && (
+          <div className="cm-toast cm-toast--info">{loadError}</div>
+        )}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json,application/json"
+          style={{ display: "none" }}
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) loadFile(f);
+            e.target.value = "";
           }}
-        >
-          loading codemap…
-        </div>
+        />
       </div>
     );
   }
@@ -492,8 +486,8 @@ export default function CodemapApp() {
         setStatusFilter={setStatusFilter}
         kindFilter={kindFilter}
         setKindFilter={setKindFilter}
-        onUploadClick={() => fileInputRef.current?.click()}
         onDownload={downloadJSON}
+        onOpenChooser={() => setChooserOpen(true)}
         onHelp={() => setHelpOpen(true)}
       />
 
@@ -556,6 +550,14 @@ export default function CodemapApp() {
         <HelpOverlay
           onClose={() => setHelpOpen(false)}
           onLoadSample={loadSample}
+        />
+      )}
+
+      {chooserOpen && (
+        <SampleChooser
+          onClose={() => setChooserOpen(false)}
+          onLoadSample={loadSample}
+          onUploadClick={() => fileInputRef.current?.click()}
         />
       )}
 
@@ -836,6 +838,92 @@ function renderMarkdownInline(text: string): React.ReactNode[] {
   return out;
 }
 
+function SampleChooser({
+  onClose,
+  onLoadSample,
+  onUploadClick,
+}: {
+  onClose?: () => void;
+  onLoadSample: (path: string) => void;
+  onUploadClick: () => void;
+}) {
+  const [samples, setSamples] = useState<SampleSummary[]>([]);
+  const [loadState, setLoadState] = useState<"loading" | "ready" | "error">(
+    "loading",
+  );
+
+  useEffect(() => {
+    fetch("/api/samples")
+      .then((r) => {
+        if (!r.ok) throw new Error("HTTP " + r.status);
+        return r.json();
+      })
+      .then((json: SampleSummary[]) => {
+        setSamples(json);
+        setLoadState("ready");
+      })
+      .catch(() => setLoadState("error"));
+  }, []);
+
+  return (
+    <div className="cm-chooser" onClick={onClose}>
+      <div className="cm-chooser-card" onClick={(e) => e.stopPropagation()}>
+        <div className="cm-chooser-header">
+          <div>
+            <h1>Codemap</h1>
+            <p>
+              Choose a bundled sample, upload a codemap, or install the skill in
+              another repo.
+            </p>
+          </div>
+          <a className="cm-chooser-skill" href="/api/skill" download>
+            Download SKILL.md
+          </a>
+          {onClose && (
+            <button
+              className="cm-popup-close cm-chooser-close"
+              onClick={onClose}
+              title="Close"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        <div className="cm-chooser-actions">
+          <button className="cm-chooser-upload" onClick={onUploadClick}>
+            Upload codemap.json
+          </button>
+          <span>Drop a JSON file anywhere on this screen.</span>
+        </div>
+
+        <div className="cm-chooser-section-title">Samples</div>
+        <div className="cm-chooser-samples">
+          {loadState === "loading" && (
+            <div className="cm-chooser-empty">Loading samples…</div>
+          )}
+          {loadState === "error" && (
+            <div className="cm-chooser-empty">Could not load samples.</div>
+          )}
+          {loadState === "ready" &&
+            samples.map((sample) => (
+              <button
+                key={sample.path}
+                className="cm-chooser-sample"
+                onClick={() => onLoadSample(sample.path)}
+              >
+                <span className="cm-chooser-sample-name">{sample.name}</span>
+                <span className="cm-chooser-sample-meta">
+                  {sample.branches} branches · {sample.path}
+                </span>
+              </button>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // === Search panel ===
 interface SearchPanelProps {
   codemap: CodemapData;
@@ -855,8 +943,8 @@ interface SearchPanelProps {
   setStatusFilter: (s: BranchStatus | null) => void;
   kindFilter: Exclude<EntryKind, "branch"> | null;
   setKindFilter: (k: Exclude<EntryKind, "branch"> | null) => void;
-  onUploadClick: () => void;
   onDownload: () => void;
+  onOpenChooser: () => void;
   onHelp: () => void;
 }
 
@@ -878,8 +966,8 @@ function SearchPanel({
   setStatusFilter,
   kindFilter,
   setKindFilter,
-  onUploadClick,
   onDownload,
+  onOpenChooser,
   onHelp,
 }: SearchPanelProps) {
   const regionFilters = Object.entries(regions).map(([key, r]) => ({
@@ -973,8 +1061,8 @@ function SearchPanel({
         <div className="cm-repo-actions">
           <button
             className="cm-icon-btn"
-            onClick={onUploadClick}
-            title="Upload .json codemap"
+            onClick={onOpenChooser}
+            title="Open samples and upload"
           >
             <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
               <path
@@ -1047,7 +1135,7 @@ function SearchPanel({
           <input
             id="codemap-search"
             className="cm-search-input"
-            placeholder="Search Branches or Ask Claude"
+            placeholder="Search Codemap or Ask Claude"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => {
