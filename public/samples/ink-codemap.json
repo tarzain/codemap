@@ -66,7 +66,8 @@
       "lastCommit": "2026-05-25",
       "message": "Main trunk — v7.0.4, React 19 CLI renderer with concurrent mode, kitty keyboard, and 5 new hooks",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "milestone/1-foundation",
@@ -84,7 +85,8 @@
       "lastCommit": "2018-09-30",
       "message": "Epoch 1 — Foundation: init through v1 with basic Box/Text/Color, yoga-layout, custom reconciler",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/2-v2-hooks",
@@ -102,7 +104,8 @@
       "lastCommit": "2019-03-03",
       "message": "Epoch 2 — v2.0 & Hooks: React hooks, Static component, error boundary, useInput",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/3-stabilization",
@@ -120,7 +123,8 @@
       "lastCommit": "2020-03-21",
       "message": "Epoch 3 — Stabilization: TypeScript rewrite, useApp/useStdin/useStdout hooks, community growth",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/4-v3-rewrite",
@@ -138,7 +142,8 @@
       "lastCommit": "2020-07-27",
       "message": "Epoch 4 — v3.0 Rewrite: new rendering pipeline, focus management, borders, colors, DevTools",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/5-esm-v4",
@@ -156,7 +161,8 @@
       "lastCommit": "2023-07-17",
       "message": "Epoch 5 — ESM & v4.0: ESM migration, React 18, yoga-wasm-web, overflow, flexWrap, gap",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/6-react19-v6",
@@ -174,7 +180,8 @@
       "lastCommit": "2025-11-19",
       "message": "Epoch 6 — React 19 & v6.0: official yoga-layout, ARIA accessibility, incremental rendering, maxFps",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/7-v7-concurrent",
@@ -192,7 +199,8 @@
       "lastCommit": "2026-05-25",
       "message": "Epoch 7 — v7.0: concurrent rendering, kitty keyboard, 5 new hooks, alternate screen, animation",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "declerative-cursor",
@@ -210,7 +218,8 @@
       "lastCommit": "2026-02-12",
       "message": "Declarative <Cursor> component — alternative to useCursor hook for IME cursor positioning",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "fix-uselayouteffect",
@@ -228,7 +237,8 @@
       "lastCommit": "2026-02-24",
       "message": "Fix useLayoutEffect frame flicker — addresses rendering artifact on first frame",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "striking-snow-ball",
@@ -246,7 +256,8 @@
       "lastCommit": "2023-04-24",
       "message": "Scroll WIP — experimental scrolling support for Box components",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "amazing-lucas-sinclair",
@@ -264,7 +275,8 @@
       "lastCommit": "2023-05-02",
       "message": "Fix rendering when terminal is erased on first render — superseded by later rendering fixes",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "bn-l/master",
@@ -282,7 +294,8 @@
       "lastCommit": "2023-03-28",
       "message": "External contributor fork — stale",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "esm",
@@ -300,7 +313,8 @@
       "lastCommit": "2023-03-01",
       "message": "ESM migration attempt — completed differently in v4.0.0",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "lovely-will-byers",
@@ -318,7 +332,8 @@
       "lastCommit": "2023-03-01",
       "message": "Debug/development branch with extensive experimental work — never merged",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "spectacular-snow-ball",
@@ -336,7 +351,8 @@
       "lastCommit": "2023-03-01",
       "message": "Superseded ESM migration attempt",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "rad-starcourt",
@@ -354,7 +370,8 @@
       "lastCommit": "2023-03-28",
       "message": "XO upgrade attempt — XO already updated on master",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "rektdeckard-master",
@@ -372,7 +389,8 @@
       "lastCommit": "2022-02-17",
       "message": "External contributor fork — focus improvements, superseded by current focus system",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "ci-cache",
@@ -390,7 +408,8 @@
       "lastCommit": "2020-07-06",
       "message": "CI dependency caching attempt — stale since 2020",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "fix-ci",
@@ -408,7 +427,8 @@
       "lastCommit": "2021-10-07",
       "message": "CI fixes already on master",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "fix-flaky-tests",
@@ -426,7 +446,8 @@
       "lastCommit": "2020-07-06",
       "message": "Flaky test fixes already on master",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "update-ci",
@@ -444,7 +465,8 @@
       "lastCommit": "2021-10-07",
       "message": "CI updates already on master",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "hotpatch/raw-mode-hang",
@@ -462,7 +484,8 @@
       "lastCommit": "2026-05-05",
       "message": "Urgent: Defer raw mode disable to prevent process hang on component swap — bypassed review for immediate fix",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/cjk-truncation",
@@ -480,7 +503,8 @@
       "lastCommit": "2026-04-04",
       "message": "Fix CJK text truncation exceeding Box width + map 0x7F to backspace — direct rendering fixes",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/v7-features-sprint",
@@ -498,7 +522,8 @@
       "lastCommit": "2026-03-04",
       "message": "Solo feature additions: useAnimation, usePaste, alternateScreen, waitUntilRenderFlush, interactive option",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/node22-breaking",
@@ -516,7 +541,8 @@
       "lastCommit": "2026-03-24",
       "message": "Require Node.js 22 — breaking change committed directly to master",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/fullscreen-flicker",
@@ -534,7 +560,8 @@
       "lastCommit": "2026-02-21",
       "message": "Fix fullscreen rerender flicker + exit promise init + ST-terminated OSC sequences",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "refactor/split-ink-tsx",
@@ -546,13 +573,13 @@
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Decompose ink.tsx (1,193 lines): extract kitty detection, screen mode, render-frame logic",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "refactor/split-styles",
@@ -564,13 +591,13 @@
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Split styles.ts (794 lines): extract Styles type definitions to styles-types.ts",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "refactor/split-keypress-parser",
@@ -582,13 +609,13 @@
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Split parse-keypress.ts (547 lines): extract kitty protocol parser to parse-kitty-keypress.ts",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "refactor/split-app-component",
@@ -600,13 +627,13 @@
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Decompose App.tsx (752 lines): extract focus manager and animation scheduler to dedicated modules",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "cleanup/stale-branches",
@@ -618,13 +645,13 @@
       "icon": "pickaxe",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Delete 11 stale remote branches: fix-ci, fix-flaky-tests, update-ci, ci-cache, esm, lovely-will-byers, spectacular-snow-ball, rad-starcourt, amazing-lucas-sinclair, bn-l/master, rektdeckard-master",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/scroll-view",
@@ -636,13 +663,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Built-in scrollable container — ScrollView component or overflow:scroll for Box",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/mouse-input",
@@ -654,13 +681,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Mouse event support — useMouseInput hook for click, drag, and scroll wheel events",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/text-input",
@@ -672,13 +699,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Built-in TextInput component — currently requires community ink-text-input package",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/virtual-list",
@@ -690,13 +717,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Virtual list — efficient rendering of long lists without off-screen items",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/grid-layout",
@@ -708,13 +735,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "CSS Grid-like layout — Grid layout mode in addition to Flexbox",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/animated-transitions",
@@ -726,13 +753,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Built-in animated transitions between component states",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/snapshot-testing",
@@ -744,13 +771,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "First-party snapshot testing utilities for Ink components",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/worker-rendering",
@@ -762,13 +789,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Worker thread rendering — offload layout calculation to worker threads for large UIs",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/coverage-gate",
@@ -780,13 +807,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Add code coverage tracking and CI coverage gate",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/perf-benchmarks-ci",
@@ -798,13 +825,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Performance regression benchmarks in CI pipeline",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/tabs-component",
@@ -816,13 +843,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Built-in Tabs component with keyboard navigation (currently community packages)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/hmr",
@@ -834,13 +861,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Hot module replacement for development workflow",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     }
   ]
 }

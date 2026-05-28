@@ -117,7 +117,8 @@
       "lastCommit": "today",
       "message": "Update Eddie bio on pitch team slide",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "milestone/1-foundation",
@@ -131,7 +132,8 @@
       "lastCommit": "2026-03-19",
       "message": "Epoch 1 — Initial app, NY demo, FastAPI→Vercel JS pivot, FAL, Nano Banana, shareable node routes",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/2-browser-shell",
@@ -145,7 +147,8 @@
       "lastCommit": "2026-04-06",
       "message": "Epoch 2 — Browser-shell redesign, Paris demo, streamed draft previews, Grok, tap understanding, share overlay",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/3-consolidation-sprint",
@@ -159,7 +162,8 @@
       "lastCommit": "2026-04-09",
       "message": "Epoch 3 — 5 PRs in 3 days: dc/cleanup, dc/state, trail removal, generation consolidation, usability polish",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/4-video-integration",
@@ -173,7 +177,8 @@
       "lastCommit": "2026-04-14",
       "message": "Epoch 4 — PR#6 live LTX video stream, retries, video UX, Vercel analytics, scaling, draft aspect ratio fixes",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/5-persistence-polish",
@@ -187,7 +192,8 @@
       "lastCommit": "2026-04-22",
       "message": "Epoch 5 — Video reliability, OG embed fixes, FAL→NB routing (PR#16), fanout removed (PR#17)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/6-waitroom-launch",
@@ -201,7 +207,8 @@
       "lastCommit": "2026-04-27",
       "message": "Epoch 6 — Redis wait room (PR#18) + admin bypass; 5 days of direct-to-main hardening; cap tuned 300→10000",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/7-gemini-migration",
@@ -215,7 +222,8 @@
       "lastCommit": "2026-05-13",
       "message": "Epoch 7 — Gemini interactions API format migration; 4-week quiet period between epochs 6 and 7",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "milestone/8-pitch-deck",
@@ -229,7 +237,8 @@
       "lastCommit": "2026-05-24",
       "message": "Epoch 8 — Protected pitch deck; active: zain-rich-input (annotation tools, 12 commits)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "milestone"
     },
     {
       "name": "hotpatch/admission-cap-crisis",
@@ -243,7 +252,8 @@
       "lastCommit": "2026-04-27",
       "message": "Raised admission cap 5× in 48hrs under live traffic: 300→400→1500→2000→5000→10000",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/waitroom-hardening",
@@ -257,7 +267,8 @@
       "lastCommit": "2026-04-25",
       "message": "5 direct commits Apr 25: release-on-close, recover-stale-admissions, shorten-TTL, OG fix, caption reserve",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/gemini-format-migration",
@@ -271,7 +282,8 @@
       "lastCommit": "2026-05-13",
       "message": "Breaking Gemini interactions API format change — fixed in 3 direct commits in one day",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/web-search-hotfix",
@@ -285,7 +297,8 @@
       "lastCommit": "2026-04-11",
       "message": "Hotfix: enable web search default and minimal thinking for Nano Banana + Gemini (3b732a7)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "hotpatch/browser-shell-direct",
@@ -299,7 +312,8 @@
       "lastCommit": "2026-04-06",
       "message": "Large direct commit: restyle entire frontend as browser shell (26a9663) — no PR",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "hotpatch"
     },
     {
       "name": "draft-only-video-turbo",
@@ -313,7 +327,8 @@
       "lastCommit": "1w ago",
       "message": "Use LTX stream as the draft-tier preview instead of Flux still image",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/ernie",
@@ -327,7 +342,8 @@
       "lastCommit": "2026-04-14",
       "message": "Use Ernie for draft image generation instead of Flux (experiment)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/fal-nb",
@@ -341,7 +357,8 @@
       "lastCommit": "2026-04-22",
       "message": "PR#16 — Route Nano Banana generation through FAL client",
       "pr": "#16",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/draft-fixes",
@@ -355,7 +372,8 @@
       "lastCommit": "2026-04-21",
       "message": "PR#13 — Separate display/generation aspect ratios, update Flux draft style prompt",
       "pr": "#13",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/nb-no-fanout",
@@ -369,7 +387,8 @@
       "lastCommit": "2026-04-22",
       "message": "PR#17 — Skip 3-aspect-ratio fanout for Nano Banana to reduce generation cost",
       "pr": "#17",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "consolidate-generation-logic",
@@ -383,7 +402,8 @@
       "lastCommit": "2026-04-09",
       "message": "PR#5 — Move all generation logic into api/_lib/sketchapedia.js, remove legacy endpoints",
       "pr": "#5",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "dc/state",
@@ -397,7 +417,8 @@
       "lastCommit": "2026-04-08",
       "message": "PR#2 — Race Nana Banana with draft preview, tap card polish, implement Interactions API",
       "pr": "#2",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "refactor/split-sketchapedia-lib",
@@ -405,13 +426,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Split 3200-line sketchapedia.js into generation / persistence / promptAuthoring / models / trace",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/image-style-presets",
@@ -419,13 +440,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Expose image style presets to the user: isometric, photorealistic, sketch, flat",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/web-search-grounding",
@@ -433,13 +454,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Enable Gemini web-search grounding in prompt authoring (currently wired but off by default)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "zain/video-reliability",
@@ -453,7 +474,8 @@
       "lastCommit": "2026-04-16",
       "message": "PR#10 — Serialize LTX stream restarts, delay retarget until draft completion",
       "pr": "#10",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/video-mode-ux-fixes",
@@ -467,7 +489,8 @@
       "lastCommit": "2026-04-13",
       "message": "PR#8 — Unify video mode loading states, restore static share fallback, refine toggle UX",
       "pr": "#8",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/realtime-video-streaming",
@@ -481,7 +504,8 @@
       "lastCommit": "2026-04-12",
       "message": "PR#6 — Add live looping LTX video stream overlay; enforce single connection; route by environment",
       "pr": "#6",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "refactor/ltx-stream-split",
@@ -489,13 +513,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Split 757-line ltxStream.js into mp4Codecs, ltxConnection, and hook layers",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/streaming-pixel-preview",
@@ -503,13 +527,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Stream real-time pixel preview from FAL during high-quality generation (FAL supports this)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "zain-rich-input",
@@ -523,7 +547,8 @@
       "lastCommit": "1d ago",
       "message": "Rich annotation tools on image: text labels, voice, and freehand drawing before submit",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/fix-tap-annotation-alignment",
@@ -537,7 +562,8 @@
       "lastCommit": "2026-04-09",
       "message": "Fix tap circle indicator misalignment with actual tap coordinates (7425fa7)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/voice-search-input",
@@ -545,13 +571,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Allow voice query input via browser microphone (groundwork in zain-rich-input)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "codex/browser-redesign",
@@ -565,7 +591,8 @@
       "lastCommit": "2026-04-09",
       "message": "Extract reusable BrowserWindow component, polish after 26a9663 browser-shell direct commit",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/back-forward-buttons-only",
@@ -579,7 +606,8 @@
       "lastCommit": "2026-04-14",
       "message": "Add browser back/forward navigation history buttons — unmerged, may conflict with history strip",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/fix-loading-preview-aspect-jump",
@@ -593,7 +621,8 @@
       "lastCommit": "2026-04-14",
       "message": "Fix image aspect ratio jump when transitioning from draft preview to final image (fd81dde path)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/fix-toggle-tooltips",
@@ -607,7 +636,8 @@
       "lastCommit": "2026-04-02",
       "message": "Fix mode toggle tooltip display and positioning (3cd358c)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "eddie/usability-polish",
@@ -621,7 +651,8 @@
       "lastCommit": "2026-04-09",
       "message": "Polish article typography, scroll-on-completion, anchor draft card to browser window",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "eddie/search-buttons",
@@ -635,7 +666,8 @@
       "lastCommit": "2026-04-09",
       "message": "Refine search bar action buttons; add article video caption and seamless playback",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "eddie/better-waiting",
@@ -649,7 +681,8 @@
       "lastCommit": "2026-04-08",
       "message": "Alternative loading state exploration to replace water ripple overlay — unmerged",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "eddie/bugbash-4-13",
@@ -663,7 +696,8 @@
       "lastCommit": "2026-04-14",
       "message": "April 13 bug bash: miscellaneous UI fixes that were not merged to main",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "remotes/origin/4-8-UX-improvements",
@@ -677,7 +711,8 @@
       "lastCommit": "2026-04-08",
       "message": "April 8 UX batch: mobile safe-area, portrait sizing, ripple timing, quality labels",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "refactor/app-jsx-decomposition",
@@ -685,13 +720,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Decompose 3200-line App.jsx: WaitRoom, useGeneration hook, SharePanel, HistoryStrip, SearchBar",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/aspect-ratio-picker",
@@ -699,13 +734,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Expose aspect ratio selector in the UI (currently auto-resolved by viewport only)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "zain/wait-room",
@@ -719,7 +754,8 @@
       "lastCommit": "2026-04-23",
       "message": "PR#18 — Redis-backed wait room: session tokens, admission TTL, queue heartbeat",
       "pr": "#18",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/admin-bypass",
@@ -733,7 +769,8 @@
       "lastCommit": "2026-04-23",
       "message": "PR#19 — HMAC-SHA256 signed admin bypass cookie to skip wait room gate",
       "pr": "#19",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/fix-waiting-room-shared-pages",
@@ -747,7 +784,8 @@
       "lastCommit": "2026-04-26",
       "message": "PR#20 — Shared-page generation joins wait room to prevent capacity bypass",
       "pr": "#20",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/scaling",
@@ -761,7 +799,8 @@
       "lastCommit": "2026-04-14",
       "message": "PR#9 — Gemini for Nano Banana, timeout stalled draft generation, Gemini grounding scope fix",
       "pr": "#9",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/urgent-scaling-fixes",
@@ -775,7 +814,8 @@
       "lastCommit": "2026-04-22",
       "message": "PR#15 — Handle capacity limits gracefully in UI, fix Gemini grounding toggle scope",
       "pr": "#15",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/waitroom-active-diagnostics",
@@ -789,7 +829,8 @@
       "lastCommit": "2026-04-24",
       "message": "Add /waitroom/inspect diagnostics with time-window admission + generation counts",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/waitroom-admission-recovery",
@@ -803,7 +844,8 @@
       "lastCommit": "2026-04-25",
       "message": "Recover stale waitroom admissions when sessions reconnect after TTL expiry",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/waitroom-connecting-state",
@@ -817,7 +859,8 @@
       "lastCommit": "2026-04-25",
       "message": "Show 'connecting' state in UI before queue position is known",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/waitroom-generation-ttl",
@@ -831,7 +874,8 @@
       "lastCommit": "2026-04-25",
       "message": "Shorten active generation TTL so crashed requests free capacity faster",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/capacity-aware-wait-estimate",
@@ -845,7 +889,8 @@
       "lastCommit": "2026-04-23",
       "message": "Make wait-time ETA proportional to current active generation count, not just queue depth",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/double-waitroom-limits",
@@ -859,7 +904,8 @@
       "lastCommit": "2026-04-23",
       "message": "Double default admission and concurrent generation caps",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/cancel-generation-aborts-backend",
@@ -873,7 +919,8 @@
       "lastCommit": "2026-04-23",
       "message": "Propagate frontend cancel to abort backend SSE handler and immediately free generation slot",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/release-generation-on-close",
@@ -887,7 +934,8 @@
       "lastCommit": "2026-04-25",
       "message": "Release active generation slot automatically when SSE stream closes",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/capacity-error-logs",
@@ -901,7 +949,8 @@
       "lastCommit": "2026-04-25",
       "message": "Log capacity limit reasons (queue full, generation cap) for incident observability",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/rate-limit-per-session",
@@ -909,13 +958,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Add per-session rate limiting on top of global waitroom to prevent single-session exhaustion",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "zain/fix-embeds",
@@ -929,7 +978,8 @@
       "lastCommit": "2026-04-21",
       "message": "PR#12 — Add OG image dimensions, remove fallback tags from shared node pages",
       "pr": "#12",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/update-embed-title",
@@ -943,7 +993,8 @@
       "lastCommit": "2026-04-21",
       "message": "PR#14 — Update shared embed branding in OG tags",
       "pr": "#14",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/update-og-preview-metadata",
@@ -957,7 +1008,8 @@
       "lastCommit": "2026-04-25",
       "message": "Fix homepage Open Graph image URL and description metadata",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/static-shared-pages",
@@ -965,13 +1017,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Pre-render shareable node HTML at persist time instead of on every request",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/local-r2-fallback",
@@ -979,13 +1031,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Fall back to local filesystem when R2 credentials not configured (dev mode)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/user-accounts",
@@ -993,13 +1045,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Tie node history to a persistent user identity rather than ephemeral session_id",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "codex/add-vercel-analytics",
@@ -1013,7 +1065,8 @@
       "lastCommit": "2026-04-14",
       "message": "Add @vercel/analytics and wire into frontend entry point (a986cf7)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/vercel-page-count-analytics",
@@ -1027,7 +1080,8 @@
       "lastCommit": "2026-04-23",
       "message": "Track page-count milestone events in Vercel Analytics via sessionStorage",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/faq-inference-source",
@@ -1041,7 +1095,8 @@
       "lastCommit": "2026-04-25",
       "message": "Add FAQ section in UI showing which model generated each image",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/model-cost-tracking",
@@ -1049,13 +1104,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Log token and image-generation counts per request for cost observability",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/debug-trace-ui",
@@ -1063,13 +1118,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Surface DEBUG_SKETCHAPEDIA_TRACE output in a developer UI for debugging generations",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "codex/allowed-origins-gate",
@@ -1083,7 +1138,8 @@
       "lastCommit": "2026-04-09",
       "message": "Gate the generation endpoint to a whitelist of allowed origins (CORS security) — unmerged",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/rename-generate-flow-endpoint",
@@ -1097,7 +1153,8 @@
       "lastCommit": "2026-04-09",
       "message": "Rename endpoint to iteratively-generate-next-page (part of PR#5 consolidation)",
       "pr": "#5",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/remove-legacy-generation-endpoints",
@@ -1111,7 +1168,8 @@
       "lastCommit": "2026-04-09",
       "message": "Remove legacy generation API endpoints superseded by consolidated flow",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "refactor/centralize-env-config",
@@ -1119,13 +1177,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Extract getConfig() in sketchapedia.js to centralize env reading with validation and defaults",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/generation-webhooks",
@@ -1133,13 +1191,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Add webhook notifications when node generation completes for external integrations",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "codex/paris-example-page",
@@ -1153,7 +1211,8 @@
       "lastCommit": "2026-04-02",
       "message": "Add Paris travel demo with pre-rendered sequence and looping video clips",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/history-of-new-york-hotspots",
@@ -1167,7 +1226,8 @@
       "lastCommit": "2026-03-14",
       "message": "Add interactive image hotspots + graph/canvas view to History of New York demo",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "eddie/article-draft",
@@ -1181,7 +1241,8 @@
       "lastCommit": "2026-04-14",
       "message": "Draft editorial article content to accompany the Sketchapedia product launch",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/code-demo",
@@ -1195,7 +1256,8 @@
       "lastCommit": "2026-04-14",
       "message": "Add code-based exploration demo flow (8302cb4 — code and factory analytics demos)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/replace-demo-video",
@@ -1209,7 +1271,8 @@
       "lastCommit": "2026-04-21",
       "message": "Replace homepage demo video asset with updated clip (a8cba4e)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/update-flipbook-article-copy",
@@ -1223,7 +1286,8 @@
       "lastCommit": "2026-04-15",
       "message": "Update Flipbook article copy and header alignment on homepage (6b1c6c1)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/graph-exploration-view",
@@ -1231,13 +1295,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Replace linear history strip with a 2D node-graph canvas view (prototype exists in NY demo)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "feat/multi-page-export",
@@ -1245,13 +1309,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Export a full exploration sequence as PDF or video slideshow",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "zain/remove-trail-state",
@@ -1265,7 +1329,8 @@
       "lastCommit": "2026-04-09",
       "message": "PR#3 — Remove legacy trail state: rename trail→session, remove explicit Gemini trail",
       "pr": "#3",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "zain/cleanup-grok",
@@ -1279,7 +1344,8 @@
       "lastCommit": "2026-04-21",
       "message": "Clean up xAI Grok model integration — remove dead config, untested generation path",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "dc/cleanup",
@@ -1293,7 +1359,8 @@
       "lastCommit": "2026-04-07",
       "message": "PR#1 — 'huge cleanup': remove dead code, unused model paths, old state",
       "pr": "#1",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "dc/retry",
@@ -1307,7 +1374,8 @@
       "lastCommit": "2026-04-13",
       "message": "PR#7 — Add backend retry logic for upstream model failures",
       "pr": "#7",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "codex/remove-history-graph",
@@ -1321,7 +1389,8 @@
       "lastCommit": "2026-04-09",
       "message": "Remove legacy history-graph visualization page (44de830)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "cleanup/flipbook-storage-keys",
@@ -1329,13 +1398,13 @@
       "icon": "rock",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Rename legacy flipbook_* sessionStorage analytics keys to sketchapedia_*",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "cleanup/remove-xai-path",
@@ -1343,13 +1412,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Remove or explicitly flag generateImageWithXai() as experimental — untested non-default path",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     },
     {
       "name": "refactor/shared-constants",
@@ -1357,13 +1426,13 @@
       "icon": "tent",
       "author": "—",
       "commits": 0,
-      "status": "suggested",
       "ahead": 0,
       "behind": 0,
       "lastCommit": "—",
       "message": "Extract aspect-ratio constants, SSE event names, and API paths into shared constants files",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "suggested"
     }
   ]
 }

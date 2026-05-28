@@ -4,16 +4,29 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { generateWorld } from '@/lib/mapgen';
 import MapView from './MapView';
 import { useTweaks, TweaksPanel, TweakSection, TweakNumber, TweakToggle } from './TweaksPanel';
-import type { CodemapData, Branch, World } from '@/lib/types';
+import {
+  entryKind,
+  entryStatus,
+  type BranchStatus,
+  type CodemapData,
+  type Branch,
+  type EntryKind,
+  type World,
+} from '@/lib/types';
 
-const STATUS_COLOR: Record<string, string> = {
+const STATUS_COLOR: Record<BranchStatus, string> = {
   open: '#3a82c4',
   draft: '#9a8a6a',
-  suggested: '#b088d0',
   merged: '#7aa648',
   stale: '#7d7569',
   protected: '#d4a23a',
   release: '#9a5ac4',
+};
+
+const KIND_COLOR: Record<Exclude<EntryKind, 'branch'>, string> = {
+  suggested: '#b088d0',
+  milestone: '#9a5ac4',
+  hotpatch: '#d4583a',
 };
 
 const FALLBACK_CODEMAP: CodemapData = {
@@ -28,6 +41,7 @@ const FALLBACK_CODEMAP: CodemapData = {
     {
       name: 'main',
       region: 'capital',
+      kind: 'branch',
       icon: 'castle',
       author: 'team',
       commits: 0,
@@ -57,7 +71,7 @@ export default function CodemapApp() {
         return r.json();
       })
       .then((json) => {
-        setCodemap(json);
+        setCodemap(json as CodemapData);
         setLoadError(null);
       })
       .catch((err) => {
@@ -78,7 +92,8 @@ export default function CodemapApp() {
   const [focusBranch, setFocusBranch] = useState<{ name: string; ts: number } | null>(null);
   const [query, setQuery] = useState('');
   const [activeFilters, setActiveFilters] = useState(new Set<string>());
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<BranchStatus | null>(null);
+  const [kindFilter, setKindFilter] = useState<Exclude<EntryKind, 'branch'> | null>(null);
   const [searchFocused, setSearchFocused] = useState(false);
   const [viewportSize, setViewportSize] = useState<{ w: number; h: number } | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -105,13 +120,15 @@ export default function CodemapApp() {
     setQuery('');
     setActiveFilters(new Set());
     setStatusFilter(null);
+    setKindFilter(null);
   }, [codemap]);
 
   const dimmedSet = useMemo(() => {
     const hasQuery = query.trim().length > 0;
     const hasFilter = activeFilters.size > 0;
     const hasStatus = !!statusFilter;
-    if (!hasQuery && !hasFilter && !hasStatus) return new Set<string>();
+    const hasKind = !!kindFilter;
+    if (!hasQuery && !hasFilter && !hasStatus && !hasKind) return new Set<string>();
     const dim = new Set<string>();
     for (const b of branches) {
       let visible = true;
@@ -125,11 +142,12 @@ export default function CodemapApp() {
           (regions[b.region]?.label || '').toLowerCase().includes(q);
       }
       if (visible && hasFilter) visible = activeFilters.has(b.region);
-      if (visible && hasStatus) visible = b.status === statusFilter;
+      if (visible && hasStatus) visible = entryStatus(b) === statusFilter;
+      if (visible && hasKind) visible = entryKind(b) === kindFilter;
       if (!visible) dim.add(b.name);
     }
     return dim;
-  }, [query, activeFilters, statusFilter, branches, regions]);
+  }, [query, activeFilters, statusFilter, kindFilter, branches, regions]);
 
   const matchingBranches = useMemo(
     () => branches.filter((b) => !dimmedSet.has(b.name)),
@@ -316,6 +334,8 @@ export default function CodemapApp() {
         setActiveFilters={setActiveFilters}
         statusFilter={statusFilter}
         setStatusFilter={setStatusFilter}
+        kindFilter={kindFilter}
+        setKindFilter={setKindFilter}
         onUploadClick={() => fileInputRef.current?.click()}
         onDownload={downloadJSON}
         onHelp={() => setHelpOpen(true)}
@@ -347,7 +367,7 @@ export default function CodemapApp() {
         hovered={hovered ? branches.find((b) => b.name === hovered) || null : null}
         matchCount={matchingBranches.length}
         totalCount={branches.length}
-        hasFilters={query.length > 0 || activeFilters.size > 0 || !!statusFilter}
+        hasFilters={query.length > 0 || activeFilters.size > 0 || !!statusFilter || !!kindFilter}
         currentCheckout={currentCheckout}
         repoName={codemap.name}
         onJumpToCheckout={() =>
@@ -403,6 +423,9 @@ export default function CodemapApp() {
 }
 
 // === Codemap JSON validation ===
+const VALID_KINDS: EntryKind[] = ['branch', 'milestone', 'hotpatch', 'suggested'];
+const VALID_STATUSES: BranchStatus[] = ['open', 'draft', 'merged', 'stale', 'protected', 'release'];
+
 function validateCodemap(json: unknown): { ok: boolean; error?: string } {
   if (!json || typeof json !== 'object') return { ok: false, error: 'Not an object.' };
   const j = json as Record<string, unknown>;
@@ -418,8 +441,30 @@ function validateCodemap(json: unknown): { ok: boolean; error?: string } {
     if (!b.region) return { ok: false, error: `Branch "${b.name}" missing 'region'.` };
     if (!(j.regions as Record<string, unknown>)[b.region as string])
       return { ok: false, error: `Branch "${b.name}" references unknown region "${b.region}".` };
+    if (!b.kind) return { ok: false, error: `Branch "${b.name}" missing 'kind'.` };
+    const kind = b.kind as EntryKind;
+    if (!VALID_KINDS.includes(kind))
+      return { ok: false, error: `Branch "${b.name}" has invalid kind "${String(b.kind)}".` };
+    if (b.status !== undefined && !VALID_STATUSES.includes(b.status as BranchStatus))
+      return { ok: false, error: `Branch "${b.name}" has invalid status "${String(b.status)}".` };
+    if (kind === 'branch' && !b.status)
+      return { ok: false, error: `Branch "${b.name}" missing 'status'.` };
   }
   return { ok: true };
+}
+
+function entryDisplayColor(branch: Branch): string {
+  const kind = entryKind(branch);
+  if (kind !== 'branch') return KIND_COLOR[kind];
+  const status = entryStatus(branch);
+  return status ? STATUS_COLOR[status] : '#888';
+}
+
+function entryDisplayLabel(branch: Branch): string {
+  const kind = entryKind(branch);
+  if (kind !== 'branch') return capitalize(kind);
+  const status = entryStatus(branch);
+  return status ? capitalize(status) : 'Branch';
 }
 
 // === Search panel ===
@@ -435,8 +480,10 @@ interface SearchPanelProps {
   onPickBranch: (name: string) => void;
   activeFilters: Set<string>;
   setActiveFilters: (f: Set<string>) => void;
-  statusFilter: string | null;
-  setStatusFilter: (s: string | null) => void;
+  statusFilter: BranchStatus | null;
+  setStatusFilter: (s: BranchStatus | null) => void;
+  kindFilter: Exclude<EntryKind, 'branch'> | null;
+  setKindFilter: (k: Exclude<EntryKind, 'branch'> | null) => void;
   onUploadClick: () => void;
   onDownload: () => void;
   onHelp: () => void;
@@ -456,6 +503,8 @@ function SearchPanel({
   setActiveFilters,
   statusFilter,
   setStatusFilter,
+  kindFilter,
+  setKindFilter,
   onUploadClick,
   onDownload,
   onHelp,
@@ -468,11 +517,17 @@ function SearchPanel({
   const STATUSES = [
     { key: 'open', label: 'Open', color: STATUS_COLOR.open },
     { key: 'draft', label: 'Draft PR', color: STATUS_COLOR.draft },
-    { key: 'suggested', label: 'Suggested', color: STATUS_COLOR.suggested },
     { key: 'merged', label: 'Merged', color: STATUS_COLOR.merged },
     { key: 'protected', label: 'Protected', color: STATUS_COLOR.protected },
+    { key: 'release', label: 'Release', color: STATUS_COLOR.release },
     { key: 'stale', label: 'Stale', color: STATUS_COLOR.stale },
-  ];
+  ] satisfies Array<{ key: BranchStatus; label: string; color: string }>;
+
+  const KINDS = [
+    { key: 'milestone', label: 'Milestone', color: KIND_COLOR.milestone },
+    { key: 'hotpatch', label: 'Hotpatch', color: KIND_COLOR.hotpatch },
+    { key: 'suggested', label: 'Suggested', color: KIND_COLOR.suggested },
+  ] satisfies Array<{ key: Exclude<EntryKind, 'branch'>; label: string; color: string }>;
 
   function toggleFilter(key: string) {
     const next = new Set(activeFilters);
@@ -481,14 +536,24 @@ function SearchPanel({
     setActiveFilters(next);
   }
 
-  const hasFilters = activeFilters.size > 0 || statusFilter || query.length > 0;
+  const hasFilters = activeFilters.size > 0 || statusFilter || kindFilter || query.length > 0;
 
   const suggestions = useMemo(() => {
     const arr = [...matchingBranches];
     arr.sort((a, b) => {
-      const order: Record<string, number> = { protected: 0, release: 1, open: 2, draft: 3, suggested: 4, merged: 5, stale: 6 };
-      const oa = order[a.status] ?? 6;
-      const ob = order[b.status] ?? 6;
+      const order: Record<string, number> = {
+        protected: 0,
+        release: 1,
+        open: 2,
+        draft: 3,
+        milestone: 4,
+        hotpatch: 5,
+        suggested: 6,
+        merged: 7,
+        stale: 8,
+      };
+      const oa = order[entryKind(a) === 'branch' ? entryStatus(a) || 'branch' : entryKind(a)] ?? 9;
+      const ob = order[entryKind(b) === 'branch' ? entryStatus(b) || 'branch' : entryKind(b)] ?? 9;
       if (oa !== ob) return oa - ob;
       return 0;
     });
@@ -572,6 +637,16 @@ function SearchPanel({
               {s.label}
             </button>
           ))}
+          {KINDS.map((k) => (
+            <button
+              key={k.key}
+              className={'cm-status-chip' + (kindFilter === k.key ? ' is-active' : '')}
+              onClick={() => setKindFilter(kindFilter === k.key ? null : k.key)}
+            >
+              <span className="cm-status-dot" style={{ background: k.color }} />
+              {k.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -581,7 +656,7 @@ function SearchPanel({
             <span>
               {query
                 ? `Matches for "${query}"`
-                : activeFilters.size || statusFilter
+                : activeFilters.size || statusFilter || kindFilter
                 ? 'Filtered'
                 : 'Recent activity'}
             </span>
@@ -604,7 +679,7 @@ function SearchPanel({
               >
                 <span
                   className="cm-suggest-dot"
-                  style={{ background: STATUS_COLOR[b.status] || '#888' }}
+                  style={{ background: entryDisplayColor(b) }}
                 />
                 <span className="cm-suggest-name">{b.name}</span>
                 <span className="cm-suggest-meta">
@@ -649,6 +724,10 @@ function BranchPopup({
   onCopyCheckout,
   onOpenPullRequest,
 }: BranchPopupProps) {
+  const kind = entryKind(branch);
+  const status = entryStatus(branch);
+  const isRealBranch = kind === 'branch';
+  const markerColor = entryDisplayColor(branch);
   const related = useMemo(
     () =>
       branches.filter((b) => b.name !== branch.name && b.region === branch.region).slice(0, 4),
@@ -659,7 +738,7 @@ function BranchPopup({
     <div className="cm-popup">
       <div
         className="cm-popup-header"
-        style={{ borderLeftColor: STATUS_COLOR[branch.status] || '#888' }}
+        style={{ borderLeftColor: markerColor }}
       >
         <div className="cm-popup-region">{regionLabel}</div>
         <h2 className="cm-popup-name" title={branch.name}>
@@ -671,16 +750,24 @@ function BranchPopup({
       </div>
 
       <div className="cm-popup-stats">
-        <div className="cm-stat">
-          <span className="cm-stat-label">Status</span>
-          <span className="cm-stat-value">
-            <span
-              className="cm-status-dot"
-              style={{ background: STATUS_COLOR[branch.status] || '#888' }}
-            />
-            {capitalize(branch.status)}
-          </span>
-        </div>
+        {!isRealBranch && (
+          <div className="cm-stat">
+            <span className="cm-stat-label">Kind</span>
+            <span className="cm-stat-value">
+              <span className="cm-status-dot" style={{ background: markerColor }} />
+              {entryDisplayLabel(branch)}
+            </span>
+          </div>
+        )}
+        {status && (
+          <div className="cm-stat">
+            <span className="cm-stat-label">Status</span>
+            <span className="cm-stat-value">
+              <span className="cm-status-dot" style={{ background: markerColor }} />
+              {capitalize(status)}
+            </span>
+          </div>
+        )}
         {branch.pr && (
           <div className="cm-stat">
             <span className="cm-stat-label">PR</span>
@@ -705,7 +792,9 @@ function BranchPopup({
       </div>
 
       <div className="cm-popup-commit">
-        <div className="cm-popup-section-label">Latest commit · {branch.lastCommit}</div>
+        <div className="cm-popup-section-label">
+          {isRealBranch ? `Latest commit · ${branch.lastCommit || '—'}` : 'Summary'}
+        </div>
         <div className="cm-popup-message">{branch.message}</div>
       </div>
 
@@ -733,7 +822,7 @@ function BranchPopup({
             <button key={r.name} className="cm-related-row" onClick={() => onJumpRelated(r.name)}>
               <span
                 className="cm-status-dot"
-                style={{ background: STATUS_COLOR[r.status] || '#888' }}
+                style={{ background: entryDisplayColor(r) }}
               />
               <span className="cm-related-name">{shortLabel(r.name)}</span>
               <span className="cm-related-arrow">→</span>
@@ -742,18 +831,20 @@ function BranchPopup({
         </div>
       )}
 
-      <div className="cm-popup-actions">
-        <button className="cm-action cm-action--primary" onClick={onCopyCheckout}>
-          <span className="cm-action-icon">⎘</span>
-          <span>Copy checkout</span>
-        </button>
-        {pullRequestUrl && (
-          <button className="cm-action" onClick={onOpenPullRequest}>
-            <span className="cm-action-icon">↗</span>
-            <span>{branch.pr ? 'Open PR' : 'Create PR'}</span>
+      {isRealBranch && (
+        <div className="cm-popup-actions">
+          <button className="cm-action cm-action--primary" onClick={onCopyCheckout}>
+            <span className="cm-action-icon">⎘</span>
+            <span>Copy checkout</span>
           </button>
-        )}
-      </div>
+          {pullRequestUrl && (
+            <button className="cm-action" onClick={onOpenPullRequest}>
+              <span className="cm-action-icon">↗</span>
+              <span>{branch.pr ? 'Open PR' : 'Create PR'}</span>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -779,6 +870,7 @@ function checkoutCommandForBranch(branchName: string): string {
 }
 
 function pullRequestUrl(codemap: CodemapData, branch: Branch): string | null {
+  if (entryKind(branch) !== 'branch') return null;
   const repoUrl = githubRepoUrl(codemap.repo?.webUrl || codemap.repo?.remoteUrl || null);
   if (!repoUrl) return null;
 
@@ -789,7 +881,7 @@ function pullRequestUrl(codemap: CodemapData, branch: Branch): string | null {
   const head = branch.name.startsWith('remotes/origin/')
     ? branch.name.slice('remotes/origin/'.length)
     : branch.name;
-  if (!head || head === base || branch.status === 'protected') return null;
+  if (!head || head === base || entryStatus(branch) === 'protected') return null;
 
   return `${repoUrl}/compare/${encodeURIComponent(base)}...${encodeURIComponent(head)}?expand=1`;
 }
@@ -983,6 +1075,7 @@ function HelpOverlay({
     {
       "name": "feature/auth-passkeys",
       "region": "feat-auth",
+      "kind": "branch",
       "position": [-2.2, -2.4],
       "icon": "house",
       "author": "mira.k",
@@ -1008,8 +1101,12 @@ function HelpOverlay({
               </code>
             </div>
             <div>
+              <div className="cm-help-label">Kinds</div>
+              <code>branch · milestone · hotpatch · suggested</code>
+            </div>
+            <div>
               <div className="cm-help-label">Status</div>
-              <code>protected · release · open · draft · suggested · merged · stale</code>
+              <code>protected · release · open · draft · merged · stale</code>
             </div>
             <div>
               <div className="cm-help-label">Region center</div>

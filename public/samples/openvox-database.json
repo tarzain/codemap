@@ -55,7 +55,8 @@
       "lastCommit": "1h ago",
       "message": "merge: page cache eviction (#1842)",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "next",
@@ -73,7 +74,8 @@
       "lastCommit": "20m ago",
       "message": "ci: green",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "release/3.2",
@@ -93,7 +95,8 @@
       "pr": "#1850",
       "reviewers": [
         "@vex.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "wip/lsm-tree-rewrite",
@@ -111,7 +114,8 @@
       "lastCommit": "3h ago",
       "message": "storage: leveled compaction",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/wal-fsync-batching",
@@ -131,7 +135,8 @@
       "pr": "#1845",
       "reviewers": [
         "@vex.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "fix/snapshot-leak",
@@ -149,7 +154,8 @@
       "lastCommit": "yesterday",
       "message": "fix: snapshot refcount leak",
       "pr": "#1849",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/vectorized-execution",
@@ -170,7 +176,8 @@
       "reviewers": [
         "@vex.r",
         "@kara.m"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feat/json-path-pushdown",
@@ -188,7 +195,8 @@
       "lastCommit": "yesterday",
       "message": "planner: push json_path predicates",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/window-functions",
@@ -208,7 +216,8 @@
       "pr": "#1841",
       "reviewers": [
         "@silas.t"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feat/quic-protocol",
@@ -226,7 +235,8 @@
       "lastCommit": "2d ago",
       "message": "wip: quinn integration",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/tls-rotation",
@@ -244,7 +254,8 @@
       "lastCommit": "yesterday",
       "message": "tls: rotate certs without restart",
       "pr": "#1843",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feat/rust-client-v2",
@@ -264,7 +275,8 @@
       "pr": "#1846",
       "reviewers": [
         "@silas.t"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feat/python-async",
@@ -284,7 +296,8 @@
       "pr": "#1840",
       "reviewers": [
         "@pim.j"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "fix/go-driver-panic",
@@ -302,7 +315,8 @@
       "lastCommit": "yesterday",
       "message": "fix: panic on nil conn",
       "pr": "#1838",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "perf/parallel-merge",
@@ -322,7 +336,8 @@
       "pr": "#1839",
       "reviewers": [
         "@kara.m"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "perf/page-prefetcher",
@@ -340,7 +355,8 @@
       "lastCommit": "yesterday",
       "message": "io: adaptive prefetch",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "docs/architecture-2026",
@@ -358,7 +374,8 @@
       "lastCommit": "yesterday",
       "message": "docs: storage internals walkthrough",
       "pr": "#1837",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "docs/wire-protocol",
@@ -376,7 +393,8 @@
       "lastCommit": "3d ago",
       "message": "docs: wire protocol RFC",
       "pr": "#1830",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "fuzz/jepsen-multikey",
@@ -394,7 +412,8 @@
       "lastCommit": "1w ago",
       "message": "test: multi-key linearizability",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "fuzz/sqlsmith",
@@ -412,7 +431,8 @@
       "lastCommit": "2w ago",
       "message": "test: sqlsmith grammar tweaks",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     }
   ]
 }

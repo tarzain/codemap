@@ -193,12 +193,13 @@ The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes
   "branches": [
     {
       "name": "feature/foo",    // branch name (or conceptual name for planned work)
+      "kind": "<kind>",         // see Kinds below
       "region": "<region-id>",  // must match a key in regions — determines biome/terrain
       "position": [-1.5, -2.6], // [x, y] origin-centered — main at [0,0], unbounded — where this branch sits on the map
       "icon": "<icon-key>",     // see Icons below
       "author": "username",     // git author or "—" for planned
       "commits": 12,            // commit count (0 for planned)
-      "status": "<status>",     // see Statuses below
+      "status": "<status>",     // see Statuses below; omit for kind: "suggested"
       "ahead": 5,               // commits ahead of main
       "behind": 3,              // commits behind main
       "lastCommit": "2d ago",   // relative time string or "—"
@@ -244,6 +245,15 @@ Choose the biome that matches the nature of the work in each region:
 | `obelisk` | Design system, tokens, visual identity |
 | `volcano` | Performance-critical, high-urgency active work |
 
+### Kinds
+
+| Kind | Meaning |
+|------|---------|
+| `branch` | real git branch, protected branch, or release branch |
+| `milestone` | historical development epoch |
+| `hotpatch` | notable direct-to-main commit cluster |
+| `suggested` | codemap-generated planned/proposed work that does not exist yet |
+
 ### Statuses
 
 | Status | Meaning | Color |
@@ -252,7 +262,6 @@ Choose the biome that matches the nature of the work in each region:
 | `release` | release/* branches | purple |
 | `open` | active open PR or in-progress local work | blue |
 | `draft` | draft PR (exists in git, not yet ready for review) | tan |
-| `suggested` | codemap-generated — planned/proposed work that doesn't exist yet | light purple |
 | `merged` | merged into main, still listed for history | green |
 | `stale` | not updated in weeks, likely abandoned | grey |
 
@@ -319,6 +328,7 @@ Add one branch per epoch. Epochs are natural clusters of thematically related wo
 
 - **region:** assign to the region that best matches the epoch's primary topic (e.g. an auth epoch goes in the auth region)
 - **positions:** place near the topically relevant cluster, slightly closer to main than active branches in that cluster (they've already been merged — less divergent)
+- **kind:** `milestone`
 - **status:** `merged` for all
 - **icon:** use the icon that matches the type of work (e.g. `house` for features, `pickaxe` for refactoring, `fort` for infra)
 - **name:** `milestone/<N>-<slug>` e.g. `milestone/1-foundation`, `milestone/6-waitroom-launch`
@@ -333,6 +343,7 @@ Add one branch per notable cluster of direct-to-main commits (bypassed branch/PR
 
 - **region:** assign to the region the hotpatch affected (e.g. a payments hotfix goes in the payments region)
 - **positions:** place near the topically relevant cluster, close to main (hotpatches are small divergences by nature)
+- **kind:** `hotpatch`
 - **status:** `merged` for all
 - **icon:** use the icon that matches the type of work (e.g. `volcano` for emergencies, `pickaxe` for fixes)
 - **name:** `hotpatch/<slug>` e.g. `hotpatch/admission-cap-crisis`, `hotpatch/gemini-migration`
@@ -352,7 +363,7 @@ The codemap is not just a git branch viewer — it is a map of the entire work l
 
 For every refactoring opportunity, deletion candidate, and expected feature from the codetree, add a corresponding entry in the codemap with:
 - A descriptive `name` that follows existing naming conventions (e.g. `refactor/split-lib`, `feat/graph-view`, `cleanup/legacy-keys`)
-- `status: "suggested"`
+- `kind: "suggested"` and no `status`
 - `commits: 0`, `ahead: 0`, `behind: 0`
 - `author: "—"`, `lastCommit: "—"`
 - A `message` that is the one-line summary of the task from the codetree
@@ -377,12 +388,14 @@ Before finishing, verify:
 - [ ] `<project>-codetree.md` written to project root with all 11 sections
 - [ ] Every significant source file is mentioned in the codetree with a description
 - [ ] All git branches appear in §5 of the codetree
-- [ ] All refactor opportunities in §6 have a corresponding `draft` branch in the codemap
-- [ ] All planned features in §8 have a corresponding `draft` branch in the codemap
-- [ ] All deletion candidates in §7 have a corresponding `draft` branch in the codemap
+- [ ] All real git entries use `kind: "branch"` and a lifecycle `status`
+- [ ] All refactor opportunities in §6 have a corresponding `kind: "suggested"` entry in the codemap
+- [ ] All planned features in §8 have a corresponding `kind: "suggested"` entry in the codemap
+- [ ] All deletion candidates in §7 have a corresponding `kind: "suggested"` entry in the codemap
 - [ ] §11 history section covers: velocity stats, epoch timeline with state-at-end, direct-to-main table, full PR log
 - [ ] `<project>-codemap.json` written with valid JSON (no trailing commas)
 - [ ] Every branch's `region` value matches a key in `regions`
+- [ ] Every branch has a valid `kind` value
 - [ ] Every branch has a `position: [x, y]` field (origin-centered, unbounded)
 - [ ] `main` is positioned at [0, 0]
 - [ ] Branch positions reflect divergence: high-ahead branches are farther from origin

@@ -67,7 +67,8 @@
       "lastCommit": "2h ago",
       "message": "Merge pull request #2847 from feature/auth-passkeys",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "develop",
@@ -85,7 +86,8 @@
       "lastCommit": "12m ago",
       "message": "chore: bump deps",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "release/v4.2",
@@ -106,7 +108,8 @@
       "reviewers": [
         "mira.k",
         "tom.w"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "release/v4.1.x",
@@ -124,7 +127,8 @@
       "lastCommit": "3d ago",
       "message": "backport: payment retry fix",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "staging",
@@ -142,7 +146,8 @@
       "lastCommit": "47m ago",
       "message": "deploy: staging.codemap.dev",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feature/auth-passkeys",
@@ -162,7 +167,8 @@
       "pr": "#2847",
       "reviewers": [
         "ana.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/auth-sso-okta",
@@ -183,7 +189,8 @@
       "reviewers": [
         "mira.k",
         "ana.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/auth-sso-google",
@@ -201,7 +208,8 @@
       "lastCommit": "yesterday",
       "message": "google: oauth callback wiring",
       "pr": "#2853",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feature/auth-mfa-totp",
@@ -221,7 +229,8 @@
       "pr": "#2848",
       "reviewers": [
         "sam.l"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/auth-session-rotation",
@@ -239,7 +248,8 @@
       "lastCommit": "3h ago",
       "message": "auth: rotate session on privilege change",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feature/payments-stripe-v2",
@@ -260,7 +270,8 @@
       "reviewers": [
         "ana.r",
         "kai.m"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/payments-paypal",
@@ -280,7 +291,8 @@
       "pr": "#2841",
       "reviewers": [
         "tom.w"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/payments-refunds-ui",
@@ -298,7 +310,8 @@
       "lastCommit": "yesterday",
       "message": "refunds: partial refund modal",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feature/payments-tax-eu",
@@ -319,7 +332,8 @@
       "reviewers": [
         "tom.w",
         "noa.b"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/payments-invoicing",
@@ -339,7 +353,8 @@
       "pr": "#2832",
       "reviewers": [
         "kai.m"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/dashboard-redesign",
@@ -360,7 +375,8 @@
       "reviewers": [
         "sam.l",
         "mira.k"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/dashboard-widgets",
@@ -378,7 +394,8 @@
       "lastCommit": "5h ago",
       "message": "widgets: drag-and-drop grid",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feature/dashboard-charts-v3",
@@ -398,7 +415,8 @@
       "pr": "#2840",
       "reviewers": [
         "sam.l"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/onboarding-checklist",
@@ -418,7 +436,8 @@
       "pr": "#2846",
       "reviewers": [
         "noa.b"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "feature/onboarding-tours",
@@ -436,7 +455,8 @@
       "lastCommit": "yesterday",
       "message": "tours: shepherd.js integration",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "feature/onboarding-templates",
@@ -454,7 +474,8 @@
       "lastCommit": "2d ago",
       "message": "templates: starter workspace seeds",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "bugfix/login-redirect-loop",
@@ -474,7 +495,8 @@
       "pr": "#2850",
       "reviewers": [
         "ana.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "bugfix/safari-pdf-export",
@@ -494,7 +516,8 @@
       "pr": "#2844",
       "reviewers": [
         "noa.b"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "bugfix/timezone-dst",
@@ -514,7 +537,8 @@
       "pr": "#2838",
       "reviewers": [
         "sam.l"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "bugfix/avatar-upload-crash",
@@ -532,7 +556,8 @@
       "lastCommit": "4h ago",
       "message": "fix: avatar upload OOM on iOS",
       "pr": "#2852",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "bugfix/csv-export-bom",
@@ -552,7 +577,8 @@
       "pr": "#2836",
       "reviewers": [
         "kai.m"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "infra/k8s-migration",
@@ -573,7 +599,8 @@
       "reviewers": [
         "jun.p",
         "tom.w"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "infra/postgres-16-upgrade",
@@ -593,7 +620,8 @@
       "pr": "#2837",
       "reviewers": [
         "jun.p"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "infra/observability-otel",
@@ -613,7 +641,8 @@
       "pr": "#2842",
       "reviewers": [
         "ana.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "infra/ci-faster-tests",
@@ -633,7 +662,8 @@
       "pr": "#2835",
       "reviewers": [
         "ana.r"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "infra/secrets-vault",
@@ -651,7 +681,8 @@
       "lastCommit": "2d ago",
       "message": "vault: rotate root token",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "experimental/ai-pr-review",
@@ -669,7 +700,8 @@
       "lastCommit": "5d ago",
       "message": "wip: claude reviews diffs",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "experimental/edge-runtime",
@@ -687,7 +719,8 @@
       "lastCommit": "1w ago",
       "message": "wip: cloudflare workers POC",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "experimental/realtime-collab",
@@ -705,7 +738,8 @@
       "lastCommit": "3d ago",
       "message": "wip: yjs document sync",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "experimental/rust-backend",
@@ -723,7 +757,8 @@
       "lastCommit": "2w ago",
       "message": "wip: axum prototype",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "experimental/local-first",
@@ -741,7 +776,8 @@
       "lastCommit": "1w ago",
       "message": "wip: offline-first sync",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "legacy/php-admin",
@@ -759,7 +795,8 @@
       "lastCommit": "2y ago",
       "message": "frozen: do not touch",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "legacy/v2-api",
@@ -777,7 +814,8 @@
       "lastCommit": "14mo ago",
       "message": "frozen: pending sunset 2026",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "legacy/jquery-dashboard",
@@ -795,7 +833,8 @@
       "lastCommit": "18mo ago",
       "message": "frozen: do not touch",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "hotfix/billing-double-charge",
@@ -816,7 +855,8 @@
       "reviewers": [
         "ana.r",
         "kai.m"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "hotfix/outage-2026-05-21",
@@ -836,7 +876,8 @@
       "pr": "#2833",
       "reviewers": [
         "jun.p"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "docs/api-reference-v4",
@@ -854,7 +895,8 @@
       "lastCommit": "yesterday",
       "message": "docs: regenerate openapi",
       "pr": "#2834",
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "docs/migration-guide-v3-v4",
@@ -874,7 +916,8 @@
       "pr": "#2830",
       "reviewers": [
         "sam.l"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "docs/contributing",
@@ -892,7 +935,8 @@
       "lastCommit": "4d ago",
       "message": "docs: PR template",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "design/tokens-v2",
@@ -912,7 +956,8 @@
       "pr": "#2831",
       "reviewers": [
         "sam.l"
-      ]
+      ],
+      "kind": "branch"
     },
     {
       "name": "design/icon-pack",
@@ -930,7 +975,8 @@
       "lastCommit": "2d ago",
       "message": "icons: 24px stroke set",
       "pr": null,
-      "reviewers": []
+      "reviewers": [],
+      "kind": "branch"
     },
     {
       "name": "design/dark-mode",
@@ -951,7 +997,8 @@
       "reviewers": [
         "sam.l",
         "mira.k"
-      ]
+      ],
+      "kind": "branch"
     }
   ]
 }

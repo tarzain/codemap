@@ -26,20 +26,32 @@ export interface Region {
   spread?: number;
 }
 
+export type EntryKind = "branch" | "milestone" | "hotpatch" | "suggested";
+export type BranchStatus = "open" | "draft" | "merged" | "stale" | "protected" | "release";
+
 export interface Branch {
   name: string;
   region: string;
+  kind: EntryKind;
   position?: [number, number];
   icon?: string;
   author?: string;
   commits?: number;
-  status: "open" | "draft" | "suggested" | "merged" | "stale" | "protected" | "release";
+  status?: BranchStatus;
   ahead?: number;
   behind?: number;
   lastCommit?: string;
   message?: string;
   pr?: string | null;
   reviewers?: string[];
+}
+
+export function entryKind(branch: Branch): EntryKind {
+  return branch.kind;
+}
+
+export function entryStatus(branch: Branch): BranchStatus | undefined {
+  return branch.status;
 }
 
 export interface CodemapData {

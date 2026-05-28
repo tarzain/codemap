@@ -11,21 +11,26 @@ import {
   drawHexRing,
 } from '@/lib/renderer';
 import { HEX_DENSITY } from '@/lib/mapgen';
-import type { World, Placement } from '@/lib/types';
+import { entryKind, entryStatus, type World, type Placement, type BranchStatus, type EntryKind } from '@/lib/types';
 
 const { HEX_H } = HEX;
 const FOG_COLOR = '#141618';
 const FOG_BLUR_PX = 28;
 
 // Status → marker color
-const STATUS_DOT: Record<string, string> = {
+const STATUS_DOT: Record<BranchStatus, string> = {
   open: '#3a82c4',
   draft: '#9a8a6a',
-  suggested: '#b088d0',
   merged: '#8a8078',
   stale: '#7d7569',
   protected: '#d4a23a',
   release: '#9a5ac4',
+};
+
+const KIND_DOT: Record<Exclude<EntryKind, 'branch'>, string> = {
+  suggested: '#b088d0',
+  milestone: '#9a5ac4',
+  hotpatch: '#d4583a',
 };
 
 interface ViewState {
@@ -266,7 +271,7 @@ export default function MapView({
       const [cx, cy] = hexCenter(p.hx, p.hy);
       const dim = dimmedBranches && dimmedBranches.has(p.branch.name);
       ctx.globalAlpha = dim ? 0.22 : 1.0;
-      const color = STATUS_DOT[p.branch.status] || '#888';
+      const color = markerColor(p.branch);
       drawBranchMarker(ctx, cx, cy, color);
     }
     ctx.globalAlpha = 1;
@@ -387,8 +392,8 @@ export default function MapView({
         x: sx,
         y: sy + HEX_H * view.scale * 0.45,
         major:
-          p.branch.status === 'protected' ||
-          p.branch.status === 'release' ||
+          entryStatus(p.branch) === 'protected' ||
+          entryStatus(p.branch) === 'release' ||
           p.branch.name === currentCheckout,
         selected: p.branch.name === selectedBranch,
         hovered: p.branch.name === hoveredBranch,
@@ -576,7 +581,7 @@ function shouldShowLabel(
   dimmed: Set<string>,
   currentCheckout: string | undefined
 ): boolean {
-  if (placement.branch.status === 'protected' || placement.branch.status === 'release') return true;
+  if (entryStatus(placement.branch) === 'protected' || entryStatus(placement.branch) === 'release') return true;
   if (placement.branch.name === currentCheckout) return true;
   if (placement.branch.name === selected) return true;
   if (placement.branch.name === hovered) return true;
@@ -584,6 +589,13 @@ function shouldShowLabel(
   if (scale >= 3.2) return true;
   if (scale >= 2.0) return placement.isFirstInRegion === true;
   return false;
+}
+
+function markerColor(branch: Placement['branch']): string {
+  const kind = entryKind(branch);
+  if (kind !== 'branch') return KIND_DOT[kind];
+  const status = entryStatus(branch);
+  return status ? STATUS_DOT[status] : '#888';
 }
 
 function CanvasMirror({ canvas }: { canvas: HTMLCanvasElement }) {
