@@ -1501,9 +1501,9 @@ function checkoutCommandForBranch(branchName: string): string {
 function claudeCodePromptForSuggestedBranch(branch: Branch): string {
   const summary = branch.message || branch.name;
   return [
-    `Create a new branch called \`${branch.name}\` for this repository.`,
+    `/plan Create a new branch called \`${branch.name}\` for this repository.`,
     "",
-    "Then use plan mode to come up with an implementation plan for this suggested work:",
+    "and use plan mode to come up with an implementation plan for this suggested work:",
     "",
     summary,
   ].join("\n");
