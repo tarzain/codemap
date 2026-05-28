@@ -39,13 +39,17 @@ export interface Branch {
   lastCommit?: string;
   message?: string;
   pr?: string | null;
-  ci?: "passing" | "failing" | "skipped";
   reviewers?: string[];
 }
 
 export interface CodemapData {
   $schema?: string;
   name: string;
+  repo?: {
+    remoteUrl?: string;
+    webUrl?: string;
+    defaultBranch?: string;
+  };
   seed?: number;
   head?: string;
   regions: Record<string, Region>;

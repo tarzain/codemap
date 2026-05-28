@@ -37,6 +37,8 @@ ls <project-root>/
 **Git branches and history**
 ```bash
 git -C <project-root> branch -a
+git -C <project-root> remote get-url origin
+git -C <project-root> symbolic-ref refs/remotes/origin/HEAD
 git -C <project-root> log --oneline --all --graph -80
 
 # Full dated commit log for timeline reconstruction
@@ -52,6 +54,7 @@ git -C <project-root> log --oneline --merges
 **What to extract from the history:**
 - First commit date and message (the "epoch 0" anchor)
 - HEAD commit hash, date, and message
+- Origin remote URL and default branch, if present. If there is no remote, omit `repo`.
 - Total commit count on main: `git rev-list --count HEAD`
 - List of merge commits (identifies PRs and branch landings)
 - Any large direct-to-main bursts (multiple commits same day, no merge parent)
@@ -174,6 +177,11 @@ The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes
 {
   "$schema": "codemap@1",
   "name": "owner/repo",          // repo name for display
+  "repo": {
+    "remoteUrl": "git@github.com:owner/repo.git", // from `git remote get-url origin`, if present
+    "webUrl": "https://github.com/owner/repo",    // normalized GitHub web URL, if derivable
+    "defaultBranch": "main"                       // branch used as the PR compare base
+  },
   "seed": 1337,                  // integer — controls terrain noise; pick any number
   "head": "main",               // currently checked-out branch
   "regions": {
@@ -196,7 +204,6 @@ The JSON is consumed by the Codemap viewer app. Every branch in the repo becomes
       "lastCommit": "2d ago",   // relative time string or "—"
       "message": "Description of what this branch/item does",
       "pr": "#123",             // PR number string or null
-      "ci": "passing",          // "passing" | "failing" | "skipped"
       "reviewers": ["alice"]    // array of reviewer usernames
     }
   ]
@@ -348,7 +355,6 @@ For every refactoring opportunity, deletion candidate, and expected feature from
 - `status: "suggested"`
 - `commits: 0`, `ahead: 0`, `behind: 0`
 - `author: "—"`, `lastCommit: "—"`
-- `ci: "skipped"`
 - A `message` that is the one-line summary of the task from the codetree
 
 This makes the codemap a complete picture of the current state AND the future roadmap.

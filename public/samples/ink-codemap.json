@@ -66,7 +66,6 @@
       "lastCommit": "2026-05-25",
       "message": "Main trunk — v7.0.4, React 19 CLI renderer with concurrent mode, kitty keyboard, and 5 new hooks",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -85,7 +84,6 @@
       "lastCommit": "2018-09-30",
       "message": "Epoch 1 — Foundation: init through v1 with basic Box/Text/Color, yoga-layout, custom reconciler",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -104,7 +102,6 @@
       "lastCommit": "2019-03-03",
       "message": "Epoch 2 — v2.0 & Hooks: React hooks, Static component, error boundary, useInput",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -123,7 +120,6 @@
       "lastCommit": "2020-03-21",
       "message": "Epoch 3 — Stabilization: TypeScript rewrite, useApp/useStdin/useStdout hooks, community growth",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -142,7 +138,6 @@
       "lastCommit": "2020-07-27",
       "message": "Epoch 4 — v3.0 Rewrite: new rendering pipeline, focus management, borders, colors, DevTools",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -161,7 +156,6 @@
       "lastCommit": "2023-07-17",
       "message": "Epoch 5 — ESM & v4.0: ESM migration, React 18, yoga-wasm-web, overflow, flexWrap, gap",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -180,7 +174,6 @@
       "lastCommit": "2025-11-19",
       "message": "Epoch 6 — React 19 & v6.0: official yoga-layout, ARIA accessibility, incremental rendering, maxFps",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -199,7 +192,6 @@
       "lastCommit": "2026-05-25",
       "message": "Epoch 7 — v7.0: concurrent rendering, kitty keyboard, 5 new hooks, alternate screen, animation",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -218,7 +210,6 @@
       "lastCommit": "2026-02-12",
       "message": "Declarative <Cursor> component — alternative to useCursor hook for IME cursor positioning",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -237,7 +228,6 @@
       "lastCommit": "2026-02-24",
       "message": "Fix useLayoutEffect frame flicker — addresses rendering artifact on first frame",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -256,7 +246,6 @@
       "lastCommit": "2023-04-24",
       "message": "Scroll WIP — experimental scrolling support for Box components",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -275,7 +264,6 @@
       "lastCommit": "2023-05-02",
       "message": "Fix rendering when terminal is erased on first render — superseded by later rendering fixes",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -294,7 +282,6 @@
       "lastCommit": "2023-03-28",
       "message": "External contributor fork — stale",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -313,7 +300,6 @@
       "lastCommit": "2023-03-01",
       "message": "ESM migration attempt — completed differently in v4.0.0",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -332,7 +318,6 @@
       "lastCommit": "2023-03-01",
       "message": "Debug/development branch with extensive experimental work — never merged",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -351,7 +336,6 @@
       "lastCommit": "2023-03-01",
       "message": "Superseded ESM migration attempt",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -370,7 +354,6 @@
       "lastCommit": "2023-03-28",
       "message": "XO upgrade attempt — XO already updated on master",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -389,7 +372,6 @@
       "lastCommit": "2022-02-17",
       "message": "External contributor fork — focus improvements, superseded by current focus system",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -408,7 +390,6 @@
       "lastCommit": "2020-07-06",
       "message": "CI dependency caching attempt — stale since 2020",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -427,7 +408,6 @@
       "lastCommit": "2021-10-07",
       "message": "CI fixes already on master",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -446,7 +426,6 @@
       "lastCommit": "2020-07-06",
       "message": "Flaky test fixes already on master",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -465,7 +444,6 @@
       "lastCommit": "2021-10-07",
       "message": "CI updates already on master",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -484,7 +462,6 @@
       "lastCommit": "2026-05-05",
       "message": "Urgent: Defer raw mode disable to prevent process hang on component swap — bypassed review for immediate fix",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -503,7 +480,6 @@
       "lastCommit": "2026-04-04",
       "message": "Fix CJK text truncation exceeding Box width + map 0x7F to backspace — direct rendering fixes",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -522,7 +498,6 @@
       "lastCommit": "2026-03-04",
       "message": "Solo feature additions: useAnimation, usePaste, alternateScreen, waitUntilRenderFlush, interactive option",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -541,7 +516,6 @@
       "lastCommit": "2026-03-24",
       "message": "Require Node.js 22 — breaking change committed directly to master",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -560,7 +534,6 @@
       "lastCommit": "2026-02-21",
       "message": "Fix fullscreen rerender flicker + exit promise init + ST-terminated OSC sequences",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -579,7 +552,6 @@
       "lastCommit": "—",
       "message": "Decompose ink.tsx (1,193 lines): extract kitty detection, screen mode, render-frame logic",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -598,7 +570,6 @@
       "lastCommit": "—",
       "message": "Split styles.ts (794 lines): extract Styles type definitions to styles-types.ts",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -617,7 +588,6 @@
       "lastCommit": "—",
       "message": "Split parse-keypress.ts (547 lines): extract kitty protocol parser to parse-kitty-keypress.ts",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -636,7 +606,6 @@
       "lastCommit": "—",
       "message": "Decompose App.tsx (752 lines): extract focus manager and animation scheduler to dedicated modules",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -655,7 +624,6 @@
       "lastCommit": "—",
       "message": "Delete 11 stale remote branches: fix-ci, fix-flaky-tests, update-ci, ci-cache, esm, lovely-will-byers, spectacular-snow-ball, rad-starcourt, amazing-lucas-sinclair, bn-l/master, rektdeckard-master",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -674,7 +642,6 @@
       "lastCommit": "—",
       "message": "Built-in scrollable container — ScrollView component or overflow:scroll for Box",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -693,7 +660,6 @@
       "lastCommit": "—",
       "message": "Mouse event support — useMouseInput hook for click, drag, and scroll wheel events",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -712,7 +678,6 @@
       "lastCommit": "—",
       "message": "Built-in TextInput component — currently requires community ink-text-input package",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -731,7 +696,6 @@
       "lastCommit": "—",
       "message": "Virtual list — efficient rendering of long lists without off-screen items",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -750,7 +714,6 @@
       "lastCommit": "—",
       "message": "CSS Grid-like layout — Grid layout mode in addition to Flexbox",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -769,7 +732,6 @@
       "lastCommit": "—",
       "message": "Built-in animated transitions between component states",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -788,7 +750,6 @@
       "lastCommit": "—",
       "message": "First-party snapshot testing utilities for Ink components",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -807,7 +768,6 @@
       "lastCommit": "—",
       "message": "Worker thread rendering — offload layout calculation to worker threads for large UIs",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -826,7 +786,6 @@
       "lastCommit": "—",
       "message": "Add code coverage tracking and CI coverage gate",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -845,7 +804,6 @@
       "lastCommit": "—",
       "message": "Performance regression benchmarks in CI pipeline",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -864,7 +822,6 @@
       "lastCommit": "—",
       "message": "Built-in Tabs component with keyboard navigation (currently community packages)",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -883,7 +840,6 @@
       "lastCommit": "—",
       "message": "Hot module replacement for development workflow",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     }
   ]

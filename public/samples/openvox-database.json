@@ -55,7 +55,6 @@
       "lastCommit": "1h ago",
       "message": "merge: page cache eviction (#1842)",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -74,7 +73,6 @@
       "lastCommit": "20m ago",
       "message": "ci: green",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -93,7 +91,6 @@
       "lastCommit": "2d ago",
       "message": "release: 3.2.4",
       "pr": "#1850",
-      "ci": "passing",
       "reviewers": [
         "@vex.r"
       ]
@@ -114,7 +111,6 @@
       "lastCommit": "3h ago",
       "message": "storage: leveled compaction",
       "pr": null,
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -133,7 +129,6 @@
       "lastCommit": "5h ago",
       "message": "wal: batch fsync per epoch",
       "pr": "#1845",
-      "ci": "passing",
       "reviewers": [
         "@vex.r"
       ]
@@ -154,7 +149,6 @@
       "lastCommit": "yesterday",
       "message": "fix: snapshot refcount leak",
       "pr": "#1849",
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -173,7 +167,6 @@
       "lastCommit": "2h ago",
       "message": "exec: SIMD scan operators",
       "pr": "#1844",
-      "ci": "passing",
       "reviewers": [
         "@vex.r",
         "@kara.m"
@@ -195,7 +188,6 @@
       "lastCommit": "yesterday",
       "message": "planner: push json_path predicates",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -214,7 +206,6 @@
       "lastCommit": "4h ago",
       "message": "planner: LEAD/LAG nulls",
       "pr": "#1841",
-      "ci": "passing",
       "reviewers": [
         "@silas.t"
       ]
@@ -235,7 +226,6 @@
       "lastCommit": "2d ago",
       "message": "wip: quinn integration",
       "pr": null,
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -254,7 +244,6 @@
       "lastCommit": "yesterday",
       "message": "tls: rotate certs without restart",
       "pr": "#1843",
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -273,7 +262,6 @@
       "lastCommit": "30m ago",
       "message": "client: typed query builder",
       "pr": "#1846",
-      "ci": "passing",
       "reviewers": [
         "@silas.t"
       ]
@@ -294,7 +282,6 @@
       "lastCommit": "3h ago",
       "message": "py: asyncio support",
       "pr": "#1840",
-      "ci": "passing",
       "reviewers": [
         "@pim.j"
       ]
@@ -315,7 +302,6 @@
       "lastCommit": "yesterday",
       "message": "fix: panic on nil conn",
       "pr": "#1838",
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -334,7 +320,6 @@
       "lastCommit": "6h ago",
       "message": "perf: parallelize merge phase",
       "pr": "#1839",
-      "ci": "passing",
       "reviewers": [
         "@kara.m"
       ]
@@ -355,7 +340,6 @@
       "lastCommit": "yesterday",
       "message": "io: adaptive prefetch",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -374,7 +358,6 @@
       "lastCommit": "yesterday",
       "message": "docs: storage internals walkthrough",
       "pr": "#1837",
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -393,7 +376,6 @@
       "lastCommit": "3d ago",
       "message": "docs: wire protocol RFC",
       "pr": "#1830",
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -412,7 +394,6 @@
       "lastCommit": "1w ago",
       "message": "test: multi-key linearizability",
       "pr": null,
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -431,7 +412,6 @@
       "lastCommit": "2w ago",
       "message": "test: sqlsmith grammar tweaks",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     }
   ]

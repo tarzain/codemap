@@ -37,7 +37,6 @@ const FALLBACK_CODEMAP: CodemapData = {
       lastCommit: '—',
       message: '—',
       pr: null,
-      ci: 'passing',
       reviewers: [],
     },
   ],
@@ -230,6 +229,31 @@ export default function CodemapApp() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
+  function showToast(type: string, text: string) {
+    setImportMessage({ type, text });
+    setTimeout(() => setImportMessage(null), 3000);
+  }
+
+  async function copyCheckoutCommand(branch: Branch) {
+    const command = checkoutCommandForBranch(branch.name);
+    try {
+      await copyText(command);
+      showToast('success', `Copied: ${command}`);
+    } catch {
+      showToast('error', 'Could not copy checkout command.');
+    }
+  }
+
+  function openPullRequest(branch: Branch) {
+    if (!codemap) return;
+    const url = pullRequestUrl(codemap, branch);
+    if (!url) {
+      showToast('info', 'No GitHub remote URL is configured for this codemap.');
+      return;
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
+  }
+
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === '/' && (document.activeElement as HTMLElement)?.tagName !== 'INPUT') {
@@ -302,8 +326,11 @@ export default function CodemapApp() {
           branch={selectedBranchObj}
           regionLabel={regions[selectedBranchObj.region]?.label || selectedBranchObj.region}
           branches={branches}
+          pullRequestUrl={pullRequestUrl(codemap, selectedBranchObj)}
           onClose={() => setSelected(null)}
           onJumpRelated={(name) => handleSelect(name)}
+          onCopyCheckout={() => copyCheckoutCommand(selectedBranchObj)}
+          onOpenPullRequest={() => openPullRequest(selectedBranchObj)}
         />
       )}
 
@@ -439,7 +466,7 @@ function SearchPanel({
   }));
 
   const STATUSES = [
-    { key: 'open', label: 'Open PR', color: STATUS_COLOR.open },
+    { key: 'open', label: 'Open', color: STATUS_COLOR.open },
     { key: 'draft', label: 'Draft PR', color: STATUS_COLOR.draft },
     { key: 'suggested', label: 'Suggested', color: STATUS_COLOR.suggested },
     { key: 'merged', label: 'Merged', color: STATUS_COLOR.merged },
@@ -605,23 +632,28 @@ interface BranchPopupProps {
   branch: Branch;
   regionLabel: string;
   branches: Branch[];
+  pullRequestUrl: string | null;
   onClose: () => void;
   onJumpRelated: (name: string) => void;
+  onCopyCheckout: () => void;
+  onOpenPullRequest: () => void;
 }
 
-function BranchPopup({ branch, regionLabel, branches, onClose, onJumpRelated }: BranchPopupProps) {
+function BranchPopup({
+  branch,
+  regionLabel,
+  branches,
+  pullRequestUrl,
+  onClose,
+  onJumpRelated,
+  onCopyCheckout,
+  onOpenPullRequest,
+}: BranchPopupProps) {
   const related = useMemo(
     () =>
       branches.filter((b) => b.name !== branch.name && b.region === branch.region).slice(0, 4),
     [branch, branches]
   );
-
-  const ciMap: Record<string, { sym: string; color: string }> = {
-    passing: { sym: '●', color: '#7aa648' },
-    failing: { sym: '●', color: '#d64a3a' },
-    skipped: { sym: '○', color: '#9a9286' },
-  };
-  const ciIcon = (branch.ci ? ciMap[branch.ci] : null) ?? { sym: '○', color: '#888' };
 
   return (
     <div className="cm-popup">
@@ -655,13 +687,6 @@ function BranchPopup({ branch, regionLabel, branches, onClose, onJumpRelated }: 
             <span className="cm-stat-value cm-mono">{branch.pr}</span>
           </div>
         )}
-        <div className="cm-stat">
-          <span className="cm-stat-label">CI</span>
-          <span className="cm-stat-value">
-            <span style={{ color: ciIcon.color, fontSize: 14, lineHeight: 1 }}>{ciIcon.sym}</span>
-            <span style={{ marginLeft: 6 }}>{capitalize(branch.ci || '')}</span>
-          </span>
-        </div>
         <div className="cm-stat">
           <span className="cm-stat-label">Author</span>
           <span className="cm-stat-value cm-mono">{branch.author}</span>
@@ -718,14 +743,16 @@ function BranchPopup({ branch, regionLabel, branches, onClose, onJumpRelated }: 
       )}
 
       <div className="cm-popup-actions">
-        <button className="cm-action cm-action--primary">
+        <button className="cm-action cm-action--primary" onClick={onCopyCheckout}>
           <span className="cm-action-icon">⎘</span>
-          <span>Checkout</span>
+          <span>Copy checkout</span>
         </button>
-        <button className="cm-action">
-          <span className="cm-action-icon">↗</span>
-          <span>Open PR</span>
-        </button>
+        {pullRequestUrl && (
+          <button className="cm-action" onClick={onOpenPullRequest}>
+            <span className="cm-action-icon">↗</span>
+            <span>{branch.pr ? 'Open PR' : 'Create PR'}</span>
+          </button>
+        )}
       </div>
     </div>
   );
@@ -741,6 +768,77 @@ function DivergenceBar({ ahead, behind }: { ahead: number; behind: number }) {
       <div className="cm-divbar-behind" style={{ width: `${bp}%` }} />
     </div>
   );
+}
+
+function checkoutCommandForBranch(branchName: string): string {
+  const remotePrefix = 'remotes/origin/';
+  if (branchName.startsWith(remotePrefix)) {
+    return `git checkout --track ${shellArg('origin/' + branchName.slice(remotePrefix.length))}`;
+  }
+  return `git checkout ${shellArg(branchName)}`;
+}
+
+function pullRequestUrl(codemap: CodemapData, branch: Branch): string | null {
+  const repoUrl = githubRepoUrl(codemap.repo?.webUrl || codemap.repo?.remoteUrl || null);
+  if (!repoUrl) return null;
+
+  const prNumber = parsePullRequestNumber(branch.pr);
+  if (prNumber) return `${repoUrl}/pull/${prNumber}`;
+
+  const base = codemap.repo?.defaultBranch || 'main';
+  const head = branch.name.startsWith('remotes/origin/')
+    ? branch.name.slice('remotes/origin/'.length)
+    : branch.name;
+  if (!head || head === base || branch.status === 'protected') return null;
+
+  return `${repoUrl}/compare/${encodeURIComponent(base)}...${encodeURIComponent(head)}?expand=1`;
+}
+
+function githubRepoUrl(remote: string | null): string | null {
+  if (!remote) return null;
+  const clean = remote.trim().replace(/\/$/, '').replace(/\.git$/, '');
+  const https = clean.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)$/);
+  if (https) return `https://github.com/${https[1]}/${https[2]}`;
+
+  const ssh = clean.match(/^git@github\.com:([^/]+)\/([^/]+)$/);
+  if (ssh) return `https://github.com/${ssh[1]}/${ssh[2]}`;
+
+  const sshUrl = clean.match(/^ssh:\/\/git@github\.com\/([^/]+)\/([^/]+)$/);
+  if (sshUrl) return `https://github.com/${sshUrl[1]}/${sshUrl[2]}`;
+
+  return null;
+}
+
+function parsePullRequestNumber(pr: string | null | undefined): string | null {
+  if (!pr) return null;
+  const match = pr.match(/\d+/);
+  return match ? match[0] : null;
+}
+
+function shellArg(value: string): string {
+  return /^[A-Za-z0-9._/@:-]+$/.test(value) ? value : `'${value.replace(/'/g, `'\\''`)}'`;
+}
+
+async function copyText(text: string): Promise<void> {
+  if (navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // Fall back to the selection API below.
+    }
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.left = '-9999px';
+  document.body.appendChild(textarea);
+  textarea.select();
+  const copied = document.execCommand('copy');
+  document.body.removeChild(textarea);
+  if (!copied) throw new Error('Copy failed');
 }
 
 function ZoomControls({
@@ -865,6 +963,11 @@ function HelpOverlay({
           <pre className="cm-help-pre">{`{
   "$schema": "codemap@1",
   "name": "owner/repo",
+  "repo": {
+    "remoteUrl": "git@github.com:owner/repo.git",
+    "webUrl": "https://github.com/owner/repo",
+    "defaultBranch": "main"
+  },
   "seed": 1337,
   "head": "feature/auth-passkeys",
   "regions": {
@@ -888,7 +991,6 @@ function HelpOverlay({
       "lastCommit": "2h ago",
       "message": "auth: WebAuthn ���",
       "pr": "#2847",
-      "ci": "passing",
       "reviewers": ["ana.r"]
     }
   ]
@@ -908,10 +1010,6 @@ function HelpOverlay({
             <div>
               <div className="cm-help-label">Status</div>
               <code>protected · release · open · draft · suggested · merged · stale</code>
-            </div>
-            <div>
-              <div className="cm-help-label">CI</div>
-              <code>passing · failing · skipped</code>
             </div>
             <div>
               <div className="cm-help-label">Region center</div>

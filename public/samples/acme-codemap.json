@@ -67,7 +67,6 @@
       "lastCommit": "2h ago",
       "message": "Merge pull request #2847 from feature/auth-passkeys",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -86,7 +85,6 @@
       "lastCommit": "12m ago",
       "message": "chore: bump deps",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -105,7 +103,6 @@
       "lastCommit": "1d ago",
       "message": "release: cut v4.2.0-rc.3",
       "pr": "#2851",
-      "ci": "passing",
       "reviewers": [
         "mira.k",
         "tom.w"
@@ -127,7 +124,6 @@
       "lastCommit": "3d ago",
       "message": "backport: payment retry fix",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -146,7 +142,6 @@
       "lastCommit": "47m ago",
       "message": "deploy: staging.codemap.dev",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -165,7 +160,6 @@
       "lastCommit": "2h ago",
       "message": "auth: WebAuthn challenge persistence",
       "pr": "#2847",
-      "ci": "passing",
       "reviewers": [
         "ana.r"
       ]
@@ -186,7 +180,6 @@
       "lastCommit": "5h ago",
       "message": "okta: SAML response parsing",
       "pr": "#2849",
-      "ci": "passing",
       "reviewers": [
         "mira.k",
         "ana.r"
@@ -208,7 +201,6 @@
       "lastCommit": "yesterday",
       "message": "google: oauth callback wiring",
       "pr": "#2853",
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -227,7 +219,6 @@
       "lastCommit": "4h ago",
       "message": "totp: backup codes UI",
       "pr": "#2848",
-      "ci": "passing",
       "reviewers": [
         "sam.l"
       ]
@@ -248,7 +239,6 @@
       "lastCommit": "3h ago",
       "message": "auth: rotate session on privilege change",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -267,7 +257,6 @@
       "lastCommit": "1h ago",
       "message": "stripe: migrate to PaymentIntents",
       "pr": "#2843",
-      "ci": "passing",
       "reviewers": [
         "ana.r",
         "kai.m"
@@ -289,7 +278,6 @@
       "lastCommit": "6h ago",
       "message": "paypal: order capture flow",
       "pr": "#2841",
-      "ci": "failing",
       "reviewers": [
         "tom.w"
       ]
@@ -310,7 +298,6 @@
       "lastCommit": "yesterday",
       "message": "refunds: partial refund modal",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -329,7 +316,6 @@
       "lastCommit": "3d ago",
       "message": "tax: VAT calculation per member state",
       "pr": "#2829",
-      "ci": "passing",
       "reviewers": [
         "tom.w",
         "noa.b"
@@ -351,7 +337,6 @@
       "lastCommit": "2d ago",
       "message": "invoices: PDF rendering via puppeteer",
       "pr": "#2832",
-      "ci": "passing",
       "reviewers": [
         "kai.m"
       ]
@@ -372,7 +357,6 @@
       "lastCommit": "30m ago",
       "message": "dash: new sidebar information architecture",
       "pr": "#2845",
-      "ci": "passing",
       "reviewers": [
         "sam.l",
         "mira.k"
@@ -394,7 +378,6 @@
       "lastCommit": "5h ago",
       "message": "widgets: drag-and-drop grid",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -413,7 +396,6 @@
       "lastCommit": "yesterday",
       "message": "charts: replace chartjs with d3",
       "pr": "#2840",
-      "ci": "passing",
       "reviewers": [
         "sam.l"
       ]
@@ -434,7 +416,6 @@
       "lastCommit": "3h ago",
       "message": "onboarding: 5-step setup checklist",
       "pr": "#2846",
-      "ci": "passing",
       "reviewers": [
         "noa.b"
       ]
@@ -455,7 +436,6 @@
       "lastCommit": "yesterday",
       "message": "tours: shepherd.js integration",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -474,7 +454,6 @@
       "lastCommit": "2d ago",
       "message": "templates: starter workspace seeds",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -493,7 +472,6 @@
       "lastCommit": "1h ago",
       "message": "fix: infinite redirect on SSO timeout",
       "pr": "#2850",
-      "ci": "passing",
       "reviewers": [
         "ana.r"
       ]
@@ -514,7 +492,6 @@
       "lastCommit": "yesterday",
       "message": "fix: blob URLs in safari pdf export",
       "pr": "#2844",
-      "ci": "passing",
       "reviewers": [
         "noa.b"
       ]
@@ -535,7 +512,6 @@
       "lastCommit": "2d ago",
       "message": "fix: DST offset in scheduled reports",
       "pr": "#2838",
-      "ci": "passing",
       "reviewers": [
         "sam.l"
       ]
@@ -556,7 +532,6 @@
       "lastCommit": "4h ago",
       "message": "fix: avatar upload OOM on iOS",
       "pr": "#2852",
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -575,7 +550,6 @@
       "lastCommit": "3d ago",
       "message": "fix: missing BOM in CSV export",
       "pr": "#2836",
-      "ci": "passing",
       "reviewers": [
         "kai.m"
       ]
@@ -596,7 +570,6 @@
       "lastCommit": "2h ago",
       "message": "k8s: helm chart for api workers",
       "pr": "#2839",
-      "ci": "passing",
       "reviewers": [
         "jun.p",
         "tom.w"
@@ -618,7 +591,6 @@
       "lastCommit": "yesterday",
       "message": "pg: test partitioning on staging",
       "pr": "#2837",
-      "ci": "passing",
       "reviewers": [
         "jun.p"
       ]
@@ -639,7 +611,6 @@
       "lastCommit": "6h ago",
       "message": "otel: trace context propagation",
       "pr": "#2842",
-      "ci": "passing",
       "reviewers": [
         "ana.r"
       ]
@@ -660,7 +631,6 @@
       "lastCommit": "yesterday",
       "message": "ci: shard jest across 8 workers",
       "pr": "#2835",
-      "ci": "passing",
       "reviewers": [
         "ana.r"
       ]
@@ -681,7 +651,6 @@
       "lastCommit": "2d ago",
       "message": "vault: rotate root token",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -700,7 +669,6 @@
       "lastCommit": "5d ago",
       "message": "wip: claude reviews diffs",
       "pr": null,
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -719,7 +687,6 @@
       "lastCommit": "1w ago",
       "message": "wip: cloudflare workers POC",
       "pr": null,
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -738,7 +705,6 @@
       "lastCommit": "3d ago",
       "message": "wip: yjs document sync",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -757,7 +723,6 @@
       "lastCommit": "2w ago",
       "message": "wip: axum prototype",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -776,7 +741,6 @@
       "lastCommit": "1w ago",
       "message": "wip: offline-first sync",
       "pr": null,
-      "ci": "failing",
       "reviewers": []
     },
     {
@@ -795,7 +759,6 @@
       "lastCommit": "2y ago",
       "message": "frozen: do not touch",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -814,7 +777,6 @@
       "lastCommit": "14mo ago",
       "message": "frozen: pending sunset 2026",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -833,7 +795,6 @@
       "lastCommit": "18mo ago",
       "message": "frozen: do not touch",
       "pr": null,
-      "ci": "skipped",
       "reviewers": []
     },
     {
@@ -852,7 +813,6 @@
       "lastCommit": "18m ago",
       "message": "HOTFIX: idempotency key on retry",
       "pr": "#2854",
-      "ci": "passing",
       "reviewers": [
         "ana.r",
         "kai.m"
@@ -874,7 +834,6 @@
       "lastCommit": "2d ago",
       "message": "HOTFIX: rate-limit cascade",
       "pr": "#2833",
-      "ci": "passing",
       "reviewers": [
         "jun.p"
       ]
@@ -895,7 +854,6 @@
       "lastCommit": "yesterday",
       "message": "docs: regenerate openapi",
       "pr": "#2834",
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -914,7 +872,6 @@
       "lastCommit": "3d ago",
       "message": "docs: breaking changes table",
       "pr": "#2830",
-      "ci": "passing",
       "reviewers": [
         "sam.l"
       ]
@@ -935,7 +892,6 @@
       "lastCommit": "4d ago",
       "message": "docs: PR template",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -954,7 +910,6 @@
       "lastCommit": "6h ago",
       "message": "tokens: semantic color renames",
       "pr": "#2831",
-      "ci": "passing",
       "reviewers": [
         "sam.l"
       ]
@@ -975,7 +930,6 @@
       "lastCommit": "2d ago",
       "message": "icons: 24px stroke set",
       "pr": null,
-      "ci": "passing",
       "reviewers": []
     },
     {
@@ -994,7 +948,6 @@
       "lastCommit": "yesterday",
       "message": "dark: chart palette tuning",
       "pr": "#2828",
-      "ci": "passing",
       "reviewers": [
         "sam.l",
         "mira.k"
